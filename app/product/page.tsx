@@ -133,13 +133,14 @@ const reviews = [
   },
 ];
 
-function StarIcon({ filled }: { filled: boolean }) {
 const products = [
   { id: 1, img: "/product-1.jpg", name: "Philips Series 3000/5000 Beard Trimmer", description: "Sleek charcoal black electric beard trimmer with matte finish and adjustable comb.", price: 499, badge: "NEW" },
   { id: 2, img: "/product-2.jpg", name: "Matte Black Nose Trimmer", description: "Sleek matte black electric nose and ear hair trimmer for discreet personal grooming.", price: 299, badge: "" },
   { id: 3, img: "/product-3.jpg", name: "Braun Series 5 Shaver", description: "Sleek, modern electric foil shaver for efficient and comfortable daily grooming.", price: 399, badge: "" },
-  { id: 4, img: "/product-4.jpg", name: "Professional Electric Wax Heater Kit (generic/unbranded)", description: "Compact electric wax warmer with melted wax for convenient at-home hair removal.", price: 99, badge: "" }
+  { id: 4, img: "/product-4.jpg", name: "Professional Electric Wax Heater Kit (generic/unbranded)", description: "Compact electric wax warmer with melted wax for convenient at-home hair removal.", price: 99, badge: "" },
 ];
+
+function StarIcon({ filled }: { filled: boolean }) {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill={filled ? "var(--accent)" : "none"} stroke="var(--accent)" strokeWidth="1.5" style={{ display: "inline" }}>
       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
@@ -239,859 +240,842 @@ function ProductContent() {
   }
 
   const relatedProducts = allProducts.filter((p) => p.name !== displayName).slice(0, 3);
-
   const selectedFeatureData = techHotspots.find((h) => h.id === selectedHotspot);
 
   return (
-    <div style={{ background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-body)", minHeight: "100vh" }}>
+    <div
+      style={{
+        background: "var(--bg)",
+        color: "var(--text)",
+        fontFamily: "var(--font-body)",
+        minHeight: "100vh",
+        overflowX: "hidden",
+      }}
+    >
       <Navbar />
 
       {/* ── BREADCRUMB ── */}
-      <div style={{ padding: "80px 0 0", borderBottom: "1px solid rgba(240,238,233,0.06)" }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "16px 24px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.8rem", color: "var(--muted)", fontFamily: "var(--font-body)", flexWrap: "wrap" }}>
+      <div
+        style={{
+          paddingTop: 80,
+          borderBottom: "1px solid rgba(26,26,26,0.08)",
+          background: "var(--bg)",
+        }}
+      >
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "14px 24px" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              fontSize: "0.75rem",
+              color: "var(--muted)",
+              fontFamily: "var(--font-body)",
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+              flexWrap: "wrap",
+            }}
+          >
             <button
               onClick={() => router.push("/")}
-              style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontFamily: "var(--font-body)", fontSize: "0.8rem", padding: 0 }}
+              style={{
+                background: "none",
+                border: "none",
+                color: "var(--muted)",
+                cursor: "pointer",
+                fontFamily: "var(--font-body)",
+                fontSize: "0.75rem",
+                padding: 0,
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+              }}
               onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text)")}
               onMouseLeave={(e) => (e.currentTarget.style.color = "var(--muted)")}
             >
               Home
             </button>
-            <span style={{ opacity: 0.4 }}>→</span>
+            <span style={{ opacity: 0.35, fontSize: "0.65rem" }}>›</span>
             <button
               onClick={() => router.push("/shop")}
-              style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", fontFamily: "var(--font-body)", fontSize: "0.8rem", padding: 0 }}
+              style={{
+                background: "none",
+                border: "none",
+                color: "var(--muted)",
+                cursor: "pointer",
+                fontFamily: "var(--font-body)",
+                fontSize: "0.75rem",
+                padding: 0,
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+              }}
               onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text)")}
               onMouseLeave={(e) => (e.currentTarget.style.color = "var(--muted)")}
             >
               Shop
             </button>
-            <span style={{ opacity: 0.4 }}>→</span>
-            <span style={{ color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "40ch" }}>{displayName}</span>
+            <span style={{ opacity: 0.35, fontSize: "0.65rem" }}>›</span>
+            <span
+              style={{
+                color: "var(--text)",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                maxWidth: "40ch",
+              }}
+            >
+              {displayName}
+            </span>
           </div>
         </div>
       </div>
 
-      {/* ── MAIN PRODUCT DETAIL (two-column desktop, stacked mobile) ── */}
-      <section style={{ maxWidth: 1280, margin: "0 auto", padding: "48px 24px 80px" }}>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: isMobile ? "1fr" : "55fr 45fr",
-            gap: isMobile ? "32px" : "64px",
-            alignItems: "start",
-          }}
-        >
-          {/* LEFT: sticky image */}
-          <div style={{ position: isMobile ? "relative" : "sticky", top: isMobile ? "auto" : 100 }}>
-            {/* Main image */}
-            <div
-              style={{
-                background: "var(--surface)",
-                borderRadius: "var(--radius-lg)",
-                overflow: "hidden",
-                cursor: "zoom-in",
-                border: "1px solid rgba(240,238,233,0.06)",
-                position: "relative",
-              }}
-              onClick={() => setLightboxOpen(true)}
-            >
-              <img
-                src={displayImg}
-                alt={displayName}
-                style={{
-                  width: "100%",
-                  aspectRatio: "4/5",
-                  objectFit: "contain",
-                  background: "var(--surface)",
-                  display: "block",
-                  transition: "transform 0.6s ease",
-                  maxHeight: isMobile ? 320 : 560,
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.03)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-              />
-              {/* Zoom hint */}
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 14,
-                  right: 14,
-                  background: "rgba(19,20,21,0.7)",
-                  borderRadius: "var(--radius-sm)",
-                  padding: "4px 10px",
-                  fontSize: "0.7rem",
-                  color: "var(--muted)",
-                  letterSpacing: "0.08em",
-                  fontFamily: "var(--font-body)",
-                  pointerEvents: "none",
-                }}
-              >
-                CLICK TO ENLARGE
-              </div>
-            </div>
-
-            {/* Trust strip below image */}
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "16px",
-                marginTop: 20,
-                padding: "16px 20px",
-                background: "var(--surface)",
-                borderRadius: "var(--radius-md)",
-                border: "1px solid rgba(240,238,233,0.06)",
-              }}
-            >
-              {[
-                { icon: "★", text: "4.6 · 4,800+ Verified Buyers" },
-                { icon: "⚡", text: "Ships in 24 hrs" },
-                { icon: "↩", text: "30-Day Returns" },
-              ].map((t) => (
-                <span
-                  key={t.text}
-                  style={{ fontSize: "0.78rem", color: "var(--muted)", fontFamily: "var(--font-body)", display: "flex", alignItems: "center", gap: 6 }}
-                >
-                  <span style={{ color: "var(--primary)", fontSize: "0.85rem" }}>{t.icon}</span>
-                  {t.text}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* RIGHT: info panel */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-            {/* Eyebrow */}
-            <p
-              style={{
-                fontSize: "0.7rem",
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                color: "var(--primary)",
-                fontFamily: "var(--font-body)",
-                fontWeight: 600,
-                margin: 0,
-              }}
-            >
-              Precision Grooming
-            </p>
-
-            {/* Name */}
-            <h1
-              style={{
-                fontSize: "clamp(1.8rem,3.5vw,2.8rem)",
-                fontFamily: "var(--font-heading)",
-                fontWeight: 700,
-                letterSpacing: "-0.025em",
-                lineHeight: 1.05,
-                color: "var(--text)",
-                margin: 0,
-              }}
-            >
-              {displayName}
-            </h1>
-
-            {/* Price row */}
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              <span
-                style={{
-                  fontSize: "2rem",
-                  fontFamily: "var(--font-heading)",
-                  fontWeight: 700,
-                  color: "var(--accent)",
-                  letterSpacing: "-0.02em",
-                }}
-              >
-                ₹{displayPrice.toLocaleString("en-IN")}
-              </span>
-              <span
-                style={{
-                  fontSize: "0.75rem",
-                  color: "var(--muted)",
-                  fontFamily: "var(--font-body)",
-                  background: "rgba(61,196,242,0.1)",
-                  padding: "4px 10px",
-                  borderRadius: "var(--radius-pill)",
-                  letterSpacing: "0.06em",
-                  textTransform: "uppercase",
-                  border: "1px solid rgba(61,196,242,0.2)",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                Free delivery above ₹499
-              </span>
-            </div>
-
-            {/* Star rating inline */}
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div style={{ display: "flex", gap: 2 }}>
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <StarIcon key={s} filled={s <= 4} />
-                ))}
-              </div>
-              <span style={{ fontSize: "0.8rem", color: "var(--muted)", fontFamily: "var(--font-body)" }}>4.6 (4,800+ reviews)</span>
-            </div>
-
-            {/* Description */}
-            <p
-              style={{
-                fontSize: "1rem",
-                color: "var(--muted)",
-                lineHeight: 1.7,
-                fontFamily: "var(--font-body)",
-                margin: 0,
-                borderLeft: "2px solid var(--primary)",
-                paddingLeft: 16,
-              }}
-            >
-              {description}
-            </p>
-
-            {/* Quantity selector */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              <label
-                style={{
-                  fontSize: "0.72rem",
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                  color: "var(--muted)",
-                  fontFamily: "var(--font-body)",
-                  fontWeight: 600,
-                }}
-              >
-                Quantity
-              </label>
-              <div style={{ display: "flex", alignItems: "center", gap: 0, width: "fit-content", border: "1px solid rgba(240,238,233,0.12)", borderRadius: "var(--radius-md)", overflow: "hidden" }}>
-                <button
-                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  style={{
-                    width: 44,
-                    height: 44,
-                    background: "var(--surface)",
-                    border: "none",
-                    color: "var(--text)",
-                    fontSize: "1.2rem",
-                    cursor: "pointer",
-                    fontFamily: "var(--font-body)",
-                    transition: "background 0.15s ease",
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(61,196,242,0.15)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "var(--surface)")}
-                >
-                  −
-                </button>
-                <span
-                  style={{
-                    width: 56,
-                    textAlign: "center",
-                    fontFamily: "var(--font-heading)",
-                    fontWeight: 700,
-                    fontSize: "1rem",
-                    color: "var(--text)",
-                    background: "var(--bg)",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    height: 44,
-                  }}
-                >
-                  {quantity}
-                </span>
-                <button
-                  onClick={() => setQuantity((q) => q + 1)}
-                  style={{
-                    width: 44,
-                    height: 44,
-                    background: "var(--surface)",
-                    border: "none",
-                    color: "var(--text)",
-                    fontSize: "1.2rem",
-                    cursor: "pointer",
-                    fontFamily: "var(--font-body)",
-                    transition: "background 0.15s ease",
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(61,196,242,0.15)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "var(--surface)")}
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
-            {/* CTA Buttons */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <button
-                onClick={handleAddToCart}
-                style={{
-                  height: 56,
-                  background: addedState === "added" ? "rgba(61,196,242,0.15)" : "var(--primary)",
-                  color: addedState === "added" ? "var(--primary)" : "var(--bg)",
-                  border: addedState === "added" ? "1px solid var(--primary)" : "none",
-                  borderRadius: "var(--radius-md)",
-                  fontSize: "1rem",
-                  fontWeight: 700,
-                  fontFamily: "var(--font-body)",
-                  cursor: "pointer",
-                  letterSpacing: "0.04em",
-                  transition: "transform 0.15s ease, background 0.2s ease",
-                  width: "100%",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-                onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.98)")}
-                onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
-              >
-                {addedState === "added" ? "✓ Added to Cart" : "Add to Cart"}
-              </button>
-              <button
-                onClick={handleBuyNow}
-                style={{
-                  height: 56,
-                  background: "var(--accent)",
-                  color: "var(--bg)",
-                  border: "none",
-                  borderRadius: "var(--radius-md)",
-                  fontSize: "1rem",
-                  fontWeight: 700,
-                  fontFamily: "var(--font-body)",
-                  cursor: "pointer",
-                  letterSpacing: "0.04em",
-                  transition: "transform 0.15s ease",
-                  width: "100%",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-                onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.98)")}
-                onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
-              >
-                Buy Now
-              </button>
-            </div>
-
-            {/* Specs Grid */}
-            {specs.length > 0 && (
-              <div style={{ marginTop: 8 }}>
-                <p
-                  style={{
-                    fontSize: "0.72rem",
-                    letterSpacing: "0.14em",
-                    textTransform: "uppercase",
-                    color: "var(--muted)",
-                    fontFamily: "var(--font-body)",
-                    fontWeight: 600,
-                    marginBottom: 12,
-                    margin: "0 0 12px 0",
-                  }}
-                >
-                  Specifications
-                </p>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))",
-                    gap: "1px",
-                    background: "rgba(240,238,233,0.06)",
-                    border: "1px solid rgba(240,238,233,0.06)",
-                    borderRadius: "var(--radius-md)",
-                    overflow: "hidden",
-                  }}
-                >
-                  {specs.map((s) => (
-                    <div
-                      key={s.label}
-                      style={{
-                        background: "var(--surface)",
-                        padding: "12px 16px",
-                      }}
-                    >
-                      <p style={{ margin: 0, fontSize: "0.7rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--muted)", fontFamily: "var(--font-body)", fontWeight: 600 }}>
-                        {s.label}
-                      </p>
-                      <p style={{ margin: "4px 0 0", fontSize: "0.875rem", color: "var(--text)", fontFamily: "var(--font-body)", lineHeight: 1.4 }}>{s.value}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Back to shop */}
-            <button
-              onClick={() => router.push("/shop")}
-              style={{
-                background: "none",
-                border: "1px solid rgba(240,238,233,0.12)",
-                borderRadius: "var(--radius-md)",
-                color: "var(--muted)",
-                fontSize: "0.85rem",
-                fontFamily: "var(--font-body)",
-                fontWeight: 600,
-                height: 44,
-                cursor: "pointer",
-                letterSpacing: "0.06em",
-                transition: "border-color 0.15s ease, color 0.15s ease",
-                marginTop: 8,
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "var(--primary)";
-                e.currentTarget.style.color = "var(--primary)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "rgba(240,238,233,0.12)";
-                e.currentTarget.style.color = "var(--muted)";
-              }}
-            >
-              ← Back to Shop
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* ── TECHNOLOGY BREAKDOWN ── */}
+      {/* ── HERO: ASYMMETRIC 65/35 — product image full-bleed left, no card wrapper ── */}
       <section
-        className="reveal"
         style={{
-          background: "var(--surface)",
-          padding: "80px 0",
+          display: "grid",
+          gridTemplateColumns: isMobile ? "1fr" : "65fr 35fr",
+          minHeight: isMobile ? "auto" : "88vh",
+          alignItems: "stretch",
+          background: "var(--bg)",
           position: "relative",
-          overflow: "hidden",
         }}
       >
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px" }}>
-          {/* Section header */}
-          <div style={{ marginBottom: 48, display: "flex", flexDirection: "column", gap: 8 }}>
-            <p
-              style={{
-                fontSize: "0.7rem",
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                color: "var(--primary)",
-                fontFamily: "var(--font-body)",
-                fontWeight: 600,
-                margin: 0,
-              }}
-            >
-              Engineering
-            </p>
-            <h2
-              style={{
-                fontSize: "clamp(1.8rem,3.5vw,3rem)",
-                fontFamily: "var(--font-heading)",
-                fontWeight: 700,
-                letterSpacing: "-0.025em",
-                lineHeight: 1.05,
-                color: "var(--text)",
-                margin: 0,
-              }}
-            >
-              Technology Breakdown
-            </h2>
-            <p style={{ fontSize: "0.95rem", color: "var(--muted)", fontFamily: "var(--font-body)", lineHeight: 1.6, margin: 0, maxWidth: "48ch" }}>
-              Tap each hotspot to explore the precision engineering behind every trim.
-            </p>
-          </div>
-
-          {/* Image + hotspots container */}
-          <div
+        {/* LEFT: full-bleed product image — no border-radius, no card wrapper */}
+        <div
+          style={{
+            position: "relative",
+            overflow: "hidden",
+            minHeight: isMobile ? 320 : "88vh",
+            background: "#ECEEF0",
+            cursor: "zoom-in",
+          }}
+          onClick={() => setLightboxOpen(true)}
+        >
+          <img
+            src={displayImg}
+            alt={displayName}
             style={{
-              position: "relative",
               width: "100%",
-              maxWidth: 880,
-              margin: "0 auto",
-              borderRadius: "var(--radius-lg)",
-              overflow: "hidden",
-              background: "var(--bg)",
-              border: "1px solid rgba(240,238,233,0.06)",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "center",
+              display: "block",
+              transition: "transform 0.7s ease",
             }}
-          >
-            <img
-              src={displayImg}
-              alt={`${displayName} technology breakdown`}
-              style={{
-                width: "100%",
-                aspectRatio: "16/9",
-                objectFit: "contain",
-                background: "var(--bg)",
-                display: "block",
-              }}
-            />
-            {/* Hotspots */}
-            {techHotspots.map((h) => (
-              <button
-                key={h.id}
-                onClick={() => handleHotspot(h.id)}
-                style={{
-                  position: "absolute",
-                  top: h.top,
-                  left: h.left,
-                  transform: "translate(-50%, -50%)",
-                  width: 32,
-                  height: 32,
-                  borderRadius: "50%",
-                  background: selectedHotspot === h.id ? "var(--accent)" : "var(--primary)",
-                  border: "2px solid rgba(240,238,233,0.3)",
-                  color: "var(--bg)",
-                  fontSize: "0.65rem",
-                  fontWeight: 700,
-                  fontFamily: "var(--font-body)",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  opacity: selectedHotspot !== null && selectedHotspot !== h.id ? 0.4 : 1,
-                  transition: "opacity 0.25s ease, background 0.2s ease, transform 0.15s ease",
-                  zIndex: 4,
-                  boxShadow: selectedHotspot === h.id ? "0 0 0 4px rgba(201,164,102,0.3)" : "0 0 0 3px rgba(61,196,242,0.25)",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = "translate(-50%,-50%) scale(1.15)")}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = "translate(-50%,-50%) scale(1)")}
-              >
-                {h.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Slide-in panel — rendered below image on mobile, beside on desktop */}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.04)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          />
+          {/* Subtle right-edge blend so right column floats above */}
           <div
             style={{
-              marginTop: 24,
-              maxWidth: 880,
-              margin: "24px auto 0",
-              height: panelVisible && selectedFeatureData ? "auto" : 0,
-              overflow: "hidden",
-              transition: "height 0.35s ease-out",
+              position: "absolute",
+              top: 0,
+              right: 0,
+              width: "15%",
+              height: "100%",
+              background: "linear-gradient(to right, transparent, rgba(244,249,252,0.55))",
+              pointerEvents: "none",
             }}
-          >
-            {selectedFeatureData && (
-              <div
-                style={{
-                  background: "var(--bg)",
-                  borderRadius: "var(--radius-md)",
-                  border: "1px solid rgba(240,238,233,0.08)",
-                  padding: "28px 32px",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 12,
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <span
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: "50%",
-                      background: "var(--accent)",
-                      color: "var(--bg)",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "0.65rem",
-                      fontWeight: 700,
-                      fontFamily: "var(--font-body)",
-                      flexShrink: 0,
-                    }}
-                  >
-                    {selectedFeatureData.label}
-                  </span>
-                  <h3
-                    style={{
-                      fontSize: "1.2rem",
-                      fontFamily: "var(--font-heading)",
-                      fontWeight: 700,
-                      letterSpacing: "-0.02em",
-                      color: "var(--text)",
-                      margin: 0,
-                    }}
-                  >
-                    {selectedFeatureData.title}
-                  </h3>
-                </div>
-                <p style={{ fontSize: "0.95rem", color: "var(--muted)", lineHeight: 1.7, fontFamily: "var(--font-body)", margin: 0 }}>
-                  {selectedFeatureData.body}
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Hotspot legend */}
+          />
+          {/* Zoom badge */}
           <div
             style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))",
-              gap: 12,
-              marginTop: 24,
-              maxWidth: 880,
-              margin: "24px auto 0",
+              position: "absolute",
+              bottom: 16,
+              left: 16,
+              background: "rgba(244,249,252,0.85)",
+              borderRadius: "2px",
+              padding: "4px 10px",
+              fontSize: "0.65rem",
+              color: "var(--muted)",
+              letterSpacing: "0.12em",
+              fontFamily: "var(--font-body)",
+              textTransform: "uppercase",
+              pointerEvents: "none",
             }}
           >
-            {techHotspots.map((h) => (
-              <button
-                key={h.id}
-                onClick={() => handleHotspot(h.id)}
-                style={{
-                  background: selectedHotspot === h.id ? "rgba(201,164,102,0.1)" : "var(--bg)",
-                  border: `1px solid ${selectedHotspot === h.id ? "var(--accent)" : "rgba(240,238,233,0.08)"}`,
-                  borderRadius: "var(--radius-md)",
-                  padding: "14px 16px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  cursor: "pointer",
-                  transition: "border-color 0.2s ease, background 0.2s ease",
-                  textAlign: "left",
-                }}
-              >
-                <span
-                  style={{
-                    width: 24,
-                    height: 24,
-                    borderRadius: "50%",
-                    background: selectedHotspot === h.id ? "var(--accent)" : "var(--primary)",
-                    color: "var(--bg)",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "0.6rem",
-                    fontWeight: 700,
-                    fontFamily: "var(--font-body)",
-                    flexShrink: 0,
-                    transition: "background 0.2s ease",
-                  }}
-                >
-                  {h.label}
-                </span>
-                <span style={{ fontSize: "0.8rem", color: selectedHotspot === h.id ? "var(--text)" : "var(--muted)", fontFamily: "var(--font-body)", fontWeight: 600 }}>
-                  {h.title}
-                </span>
-              </button>
-            ))}
+            Click to enlarge
           </div>
         </div>
-      </section>
 
-      {/* ── SPEC BENTO ── */}
-      <section
-        className="reveal"
-        style={{ padding: "80px 0", background: "var(--bg)" }}
-      >
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px" }}>
-          <p
+        {/* RIGHT: product details — overlaps image via negative left margin on desktop */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            padding: isMobile ? "40px 24px 40px" : "64px 48px 64px 40px",
+            background: "var(--bg)",
+            position: "relative",
+            zIndex: 2,
+            marginLeft: isMobile ? 0 : -32,
+          }}
+        >
+          {/* Eyebrow */}
+          <div
             style={{
               fontSize: "0.7rem",
-              letterSpacing: "0.18em",
+              letterSpacing: "0.2em",
               textTransform: "uppercase",
-              color: "var(--primary)",
+              color: "var(--accent)",
               fontFamily: "var(--font-body)",
               fontWeight: 600,
-              marginBottom: 8,
+              marginBottom: 16,
             }}
           >
-            By the Numbers
-          </p>
-          <h2
+            Men's Grooming — Precision Series
+          </div>
+
+          {/* Headline */}
+          <h1
             style={{
-              fontSize: "clamp(1.8rem,3vw,2.8rem)",
               fontFamily: "var(--font-heading)",
-              fontWeight: 700,
+              fontSize: "clamp(2.4rem,5vw,4.2rem)",
+              fontWeight: 800,
               letterSpacing: "-0.025em",
               lineHeight: 1.05,
               color: "var(--text)",
-              marginBottom: 40,
+              margin: "0 0 20px",
             }}
           >
-            Built to Perform
-          </h2>
+            {displayName}
+          </h1>
 
+          {/* Trust signals */}
           <div
             style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))",
-              gap: 2,
-              background: "rgba(240,238,233,0.06)",
-              borderRadius: "var(--radius-lg)",
-              overflow: "hidden",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 16,
+              alignItems: "center",
+              marginBottom: 24,
+              fontSize: "0.8rem",
+              color: "var(--muted)",
+            }}
+          >
+            <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              {[1, 2, 3, 4, 5].map((s) => (
+                <StarIcon key={s} filled={s <= 4} />
+              ))}
+              <span style={{ marginLeft: 6 }}>4.6 · 4,800+ buyers</span>
+            </span>
+            <span
+              style={{
+                width: 1,
+                height: 14,
+                background: "rgba(26,26,26,0.15)",
+                display: isMobile ? "none" : "block",
+              }}
+            />
+            <span>Free delivery above ₹499</span>
+            <span
+              style={{
+                width: 1,
+                height: 14,
+                background: "rgba(26,26,26,0.15)",
+                display: isMobile ? "none" : "block",
+              }}
+            />
+            <span>Made in India</span>
+          </div>
+
+          {/* Description */}
+          <p
+            style={{
+              fontSize: "0.95rem",
+              lineHeight: 1.7,
+              color: "var(--muted)",
+              fontFamily: "var(--font-body)",
+              margin: "0 0 28px",
+              maxWidth: 360,
+            }}
+          >
+            {description}
+          </p>
+
+          {/* Price */}
+          <div
+            style={{
+              fontSize: "2rem",
+              fontWeight: 800,
+              fontFamily: "var(--font-heading)",
+              color: "var(--text)",
+              letterSpacing: "-0.02em",
+              marginBottom: 8,
+            }}
+          >
+            ₹{displayPrice.toLocaleString("en-IN")}
+          </div>
+          <div
+            style={{
+              fontSize: "0.78rem",
+              color: "var(--muted)",
+              marginBottom: 28,
+              letterSpacing: "0.04em",
+            }}
+          >
+            Inclusive of all taxes
+          </div>
+
+          {/* Quantity */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 0,
+              marginBottom: 24,
+              border: "1px solid rgba(26,26,26,0.15)",
+              borderRadius: "2px",
+              width: "fit-content",
+            }}
+          >
+            <button
+              onClick={() => setQuantity(Math.max(1, quantity - 1))}
+              style={{
+                width: 40,
+                height: 44,
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontSize: "1.2rem",
+                color: "var(--text)",
+                fontFamily: "var(--font-body)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "background 0.15s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(26,26,26,0.05)")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+            >
+              −
+            </button>
+            <span
+              style={{
+                width: 44,
+                height: 44,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontFamily: "var(--font-body)",
+                fontWeight: 600,
+                fontSize: "0.95rem",
+                color: "var(--text)",
+                borderLeft: "1px solid rgba(26,26,26,0.15)",
+                borderRight: "1px solid rgba(26,26,26,0.15)",
+              }}
+            >
+              {quantity}
+            </span>
+            <button
+              onClick={() => setQuantity(quantity + 1)}
+              style={{
+                width: 40,
+                height: 44,
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontSize: "1.2rem",
+                color: "var(--text)",
+                fontFamily: "var(--font-body)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "background 0.15s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(26,26,26,0.05)")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+            >
+              +
+            </button>
+          </div>
+
+          {/* BUTTON SYSTEM — flat, editorial, no cyan */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 360 }}>
+            {/* Primary: solid off-white with black label, borderRadius 2px, no shadow */}
+            <button
+              onClick={handleAddToCart}
+              style={{
+                height: 52,
+                padding: "0 32px",
+                background: "var(--text)",
+                color: "var(--bg)",
+                fontFamily: "var(--font-body)",
+                fontWeight: 700,
+                fontSize: "0.85rem",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                border: "none",
+                borderRadius: "2px",
+                cursor: "pointer",
+                transition: "transform 0.15s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+              onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.98)")}
+              onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
+            >
+              {addedState === "added" ? "✓ Added to Cart" : "Add to Cart"}
+            </button>
+
+            {/* Secondary: transparent with 1px border */}
+            <button
+              onClick={handleBuyNow}
+              style={{
+                height: 52,
+                padding: "0 32px",
+                background: "transparent",
+                color: "var(--text)",
+                fontFamily: "var(--font-body)",
+                fontWeight: 600,
+                fontSize: "0.85rem",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                border: "1px solid rgba(26,26,26,0.4)",
+                borderRadius: "2px",
+                cursor: "pointer",
+                transition: "transform 0.15s ease, border-color 0.15s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "scale(1.02)";
+                e.currentTarget.style.borderColor = "rgba(26,26,26,0.8)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.borderColor = "rgba(26,26,26,0.4)";
+              }}
+              onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.98)")}
+              onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
+            >
+              Buy Now
+            </button>
+          </div>
+
+          {/* Micro trust row */}
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 20,
+              marginTop: 28,
+              paddingTop: 24,
+              borderTop: "1px solid rgba(26,26,26,0.08)",
             }}
           >
             {[
-              { stat: "20", unit: "Settings", desc: "Precision comb positions from 0.5 mm to 10 mm" },
-              { stat: "90", unit: "Min Runtime", desc: "Cordless usage from a single 60-minute USB-C charge" },
-              { stat: "IPX5", unit: "Washable", desc: "Fully washable head — rinse under running water" },
-              { stat: "6K", unit: "RPM Motor", desc: "High-torque DC motor for clean, consistent cuts" },
-            ].map((item, i) => (
-              <div
-                key={item.stat}
+              {
+                icon: (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="1.5">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                ),
+                text: "1-Year Warranty",
+              },
+              {
+                icon: (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="1.5">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                ),
+                text: "Ships in 24 hrs",
+              },
+              {
+                icon: (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="1.5">
+                    <polyline points="1 4 1 10 7 10" />
+                    <path d="M3.51 15a9 9 0 102.13-9.36L1 10" />
+                  </svg>
+                ),
+                text: "30-Day Returns",
+              },
+            ].map((t, i) => (
+              <span
+                key={i}
                 style={{
-                  background: i === 0 ? "var(--surface)" : "var(--bg)",
-                  padding: "36px 28px",
                   display: "flex",
-                  flexDirection: "column",
+                  alignItems: "center",
                   gap: 6,
-                  transition: "background 0.2s ease",
+                  fontSize: "0.78rem",
+                  color: "var(--muted)",
+                  fontFamily: "var(--font-body)",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "var(--surface)")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = i === 0 ? "var(--surface)" : "var(--bg)")}
               >
-                <span
-                  style={{
-                    fontSize: "clamp(2rem,4vw,3rem)",
-                    fontFamily: "var(--font-heading)",
-                    fontWeight: 700,
-                    letterSpacing: "-0.03em",
-                    color: "var(--accent)",
-                    lineHeight: 1,
-                  }}
-                >
-                  {item.stat}
-                </span>
-                <span
-                  style={{
-                    fontSize: "0.7rem",
-                    letterSpacing: "0.14em",
-                    textTransform: "uppercase",
-                    color: "var(--primary)",
-                    fontFamily: "var(--font-body)",
-                    fontWeight: 600,
-                  }}
-                >
-                  {item.unit}
-                </span>
-                <p style={{ fontSize: "0.85rem", color: "var(--muted)", fontFamily: "var(--font-body)", lineHeight: 1.55, margin: 0, marginTop: 4 }}>{item.desc}</p>
-              </div>
+                {t.icon}
+                {t.text}
+              </span>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── MARQUEE TICKER ── */}
+      {/* ── FEATURE TICKER — editorial separator ── */}
       <div
         className="reveal"
         style={{
-          background: "var(--primary)",
-          padding: "18px 0",
+          background: "#F0F4F7",
+          borderTop: "1px solid #D8DFE4",
+          borderBottom: "1px solid #D8DFE4",
           overflow: "hidden",
-          position: "relative",
+          padding: "14px 0",
         }}
       >
         <div
           style={{
             display: "flex",
-            gap: 0,
-            animation: "marquee 22s linear infinite",
-            width: "max-content",
+            gap: 48,
+            whiteSpace: "nowrap",
+            animation: "marquee 32s linear infinite",
           }}
         >
-          {[...Array(3)].map((_, i) =>
-            ["PRECISION TRIMMING", "MATTE FINISH", "SELF-SHARPENING BLADES", "CORDLESS FREEDOM", "USB-C CHARGING", "IPX5 WASHABLE"].map((item) => (
+          {[
+            "PRECISION TRIMMING",
+            "MATTE FINISH",
+            "SELF-SHARPENING BLADES",
+            "USB-C CHARGING",
+            "IPX5 SPLASH PROOF",
+            "6,000 RPM MOTOR",
+            "20-POSITION COMB",
+            "90 MIN RUNTIME",
+            "PRECISION TRIMMING",
+            "MATTE FINISH",
+            "SELF-SHARPENING BLADES",
+            "USB-C CHARGING",
+            "IPX5 SPLASH PROOF",
+            "6,000 RPM MOTOR",
+            "20-POSITION COMB",
+            "90 MIN RUNTIME",
+          ].map((item, i) => (
+            <span
+              key={i}
+              style={{
+                fontSize: "0.72rem",
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+                color: "var(--text)",
+                fontFamily: "var(--font-body)",
+                fontWeight: 500,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 48,
+              }}
+            >
+              {item}
               <span
-                key={`${i}-${item}`}
                 style={{
-                  fontSize: "0.72rem",
-                  fontFamily: "var(--font-body)",
-                  fontWeight: 700,
-                  letterSpacing: "0.18em",
-                  color: "var(--bg)",
-                  textTransform: "uppercase",
-                  whiteSpace: "nowrap",
-                  padding: "0 28px",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 28,
+                  display: "inline-block",
+                  width: 4,
+                  height: 4,
+                  borderRadius: "50%",
+                  background: "var(--accent)",
                 }}
-              >
-                {item}
-                <span style={{ display: "inline-block", width: 4, height: 4, borderRadius: "50%", background: "var(--accent)" }} />
-              </span>
-            ))
-          )}
+              />
+            </span>
+          ))}
         </div>
-        <style>{`
-          @keyframes marquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-33.333%); }
-          }
-          .reveal.will-reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.5s ease-out, transform 0.5s ease-out; }
-          .reveal.visible { opacity: 1; transform: translateY(0); }
-        `}</style>
       </div>
 
-      {/* ── REVIEWS ── */}
-      <section className="reveal" style={{ padding: "80px 0", background: "var(--surface)" }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", justifyContent: "space-between", gap: 16, marginBottom: 40 }}>
-            <div>
-              <p
-                style={{
-                  fontSize: "0.7rem",
-                  letterSpacing: "0.18em",
-                  textTransform: "uppercase",
-                  color: "var(--primary)",
-                  fontFamily: "var(--font-body)",
-                  fontWeight: 600,
-                  marginBottom: 8,
-                }}
-              >
-                Verified Buyers
-              </p>
-              <h2
-                style={{
-                  fontSize: "clamp(1.8rem,3vw,2.8rem)",
-                  fontFamily: "var(--font-heading)",
-                  fontWeight: 700,
-                  letterSpacing: "-0.025em",
-                  lineHeight: 1.05,
-                  color: "var(--text)",
-                  margin: 0,
-                }}
-              >
-                4,800+ Reviews
-              </h2>
+      {/* ── SPECS + FEATURES: BENTO_MOSAIC ── */}
+      <section
+        className="reveal"
+        style={{
+          maxWidth: 1280,
+          margin: "0 auto",
+          padding: isMobile ? "48px 24px" : "96px 24px",
+        }}
+      >
+        <div
+          style={{
+            fontSize: "0.7rem",
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+            color: "var(--accent)",
+            fontFamily: "var(--font-body)",
+            fontWeight: 600,
+            marginBottom: 12,
+          }}
+        >
+          Specifications
+        </div>
+        <h2
+          style={{
+            fontFamily: "var(--font-heading)",
+            fontSize: "clamp(1.8rem,3vw,2.8rem)",
+            fontWeight: 700,
+            letterSpacing: "-0.02em",
+            color: "var(--text)",
+            margin: "0 0 48px",
+            lineHeight: 1.15,
+          }}
+        >
+          Built to Perform.
+          <br />
+          Engineered to Last.
+        </h2>
+
+        {/* Bento mosaic grid */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4,1fr)",
+            gridAutoRows: isMobile ? "auto" : "220px",
+            gap: 16,
+          }}
+        >
+          {/* Tile 1: large image spanning 2 cols / 2 rows */}
+          <div
+            style={{
+              gridColumn: isMobile ? "1 / -1" : "span 2",
+              gridRow: isMobile ? "auto" : "span 2",
+              overflow: "hidden",
+              borderRadius: "var(--radius-lg)",
+              background: "#ECEEF0",
+              position: "relative",
+            }}
+          >
+            <img
+              src={displayImg}
+              alt={displayName + " detail"}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: "center",
+                display: "block",
+                minHeight: isMobile ? 220 : "auto",
+                transition: "transform 0.7s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.04)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+            />
+          </div>
+
+          {/* Tile 2: headline tile */}
+          <div
+            style={{
+              background: "var(--text)",
+              borderRadius: "var(--radius-lg)",
+              padding: "var(--space-card)",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "flex-end",
+              boxShadow: "var(--shadow-md)",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "3.5rem",
+                fontWeight: 900,
+                fontFamily: "var(--font-heading)",
+                color: "var(--bg)",
+                lineHeight: 1,
+                letterSpacing: "-0.03em",
+              }}
+            >
+              6K
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              {[1, 2, 3, 4, 5].map((s) => (
-                <StarIcon key={s} filled={s <= 4} />
-              ))}
-              <span style={{ fontSize: "1rem", fontFamily: "var(--font-heading)", fontWeight: 700, color: "var(--text)", marginLeft: 4 }}>4.6 / 5</span>
+            <div
+              style={{
+                fontSize: "0.75rem",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "rgba(244,249,252,0.55)",
+                marginTop: 8,
+                fontFamily: "var(--font-body)",
+              }}
+            >
+              RPM Motor
             </div>
           </div>
 
+          {/* Tile 3: IPX5 */}
+          <div
+            style={{
+              background: "var(--bg)",
+              border: "1px solid rgba(26,26,26,0.08)",
+              borderRadius: "var(--radius-lg)",
+              padding: "var(--space-card)",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "flex-end",
+              boxShadow: "var(--shadow-sm)",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "2.8rem",
+                fontWeight: 900,
+                fontFamily: "var(--font-heading)",
+                color: "var(--text)",
+                lineHeight: 1,
+                letterSpacing: "-0.03em",
+              }}
+            >
+              IPX5
+            </div>
+            <div
+              style={{
+                fontSize: "0.75rem",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "var(--muted)",
+                marginTop: 8,
+                fontFamily: "var(--font-body)",
+              }}
+            >
+              Splash Proof
+            </div>
+          </div>
+
+          {/* Tile 4: runtime */}
+          <div
+            style={{
+              background: "var(--accent)",
+              borderRadius: "var(--radius-lg)",
+              padding: "var(--space-card)",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "flex-end",
+              boxShadow: "var(--shadow-md)",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "3rem",
+                fontWeight: 900,
+                fontFamily: "var(--font-heading)",
+                color: "#fff",
+                lineHeight: 1,
+                letterSpacing: "-0.03em",
+              }}
+            >
+              90
+            </div>
+            <div
+              style={{
+                fontSize: "0.75rem",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.75)",
+                marginTop: 8,
+                fontFamily: "var(--font-body)",
+              }}
+            >
+              Min Runtime
+            </div>
+          </div>
+
+          {/* Tile 5: 20 positions */}
+          <div
+            style={{
+              background: "var(--bg)",
+              border: "1px solid rgba(26,26,26,0.08)",
+              borderRadius: "var(--radius-lg)",
+              padding: "var(--space-card)",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "flex-end",
+              boxShadow: "var(--shadow-sm)",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "2.8rem",
+                fontWeight: 900,
+                fontFamily: "var(--font-heading)",
+                color: "var(--text)",
+                lineHeight: 1,
+                letterSpacing: "-0.03em",
+              }}
+            >
+              20
+            </div>
+            <div
+              style={{
+                fontSize: "0.75rem",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "var(--muted)",
+                marginTop: 8,
+                fontFamily: "var(--font-body)",
+              }}
+            >
+              Comb Settings
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── STATS HORIZONTAL RAIL — unequal column widths ── */}
+      <section
+        className="reveal"
+        style={{
+          background: "var(--text)",
+          padding: isMobile ? "48px 24px" : "64px 0",
+        }}
+      >
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px" }}>
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))",
-              gap: 16,
+              gridTemplateColumns: isMobile ? "1fr 1fr" : "40fr 20fr 20fr 20fr",
+              gap: 0,
+              alignItems: "center",
             }}
           >
-            {reviews.map((r) => (
+            {[
+              { num: "6K", label: "RPM", sublabel: "High-efficiency motor", big: true },
+              { num: "90", label: "min", sublabel: "Cordless runtime", big: false },
+              { num: "IPX5", label: "", sublabel: "Splash resistant", big: false },
+              { num: "20", label: "pos", sublabel: "Comb settings", big: false },
+            ].map((stat, i) => (
               <div
-                key={r.name}
+                key={i}
                 style={{
-                  background: "var(--bg)",
-                  borderRadius: "var(--radius-md)",
-                  padding: "24px",
-                  border: "1px solid rgba(240,238,233,0.06)",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 12,
-                  transition: "border-color 0.2s ease",
+                  padding: isMobile ? "24px 16px" : "32px 40px",
+                  borderLeft: i > 0 ? "1px solid #333" : "none",
+                  borderBottom: isMobile && i < 2 ? "1px solid #333" : "none",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.borderColor = "rgba(61,196,242,0.25)")}
-                onMouseLeave={(e) => (e.currentTarget.style.borderColor = "rgba(240,238,233,0.06)")}
               >
-                <div style={{ display: "flex", gap: 2 }}>
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <StarIcon key={s} filled={s <= r.stars} />
-                  ))}
+                <div
+                  style={{
+                    fontSize: stat.big
+                      ? "clamp(4rem,9vw,7rem)"
+                      : "clamp(2.4rem,4.5vw,3.8rem)",
+                    fontWeight: 900,
+                    fontFamily: "var(--font-heading)",
+                    color: "#F4F9FC",
+                    lineHeight: 1,
+                    letterSpacing: "-0.03em",
+                  }}
+                >
+                  {stat.num}
+                  {stat.label && (
+                    <span
+                      style={{
+                        fontSize: "0.4em",
+                        letterSpacing: "0.04em",
+                        color: "rgba(244,249,252,0.55)",
+                        marginLeft: 4,
+                        fontFamily: "var(--font-body)",
+                        fontWeight: 400,
+                      }}
+                    >
+                      {stat.label}
+                    </span>
+                  )}
                 </div>
-                <p style={{ fontSize: "0.9rem", color: "var(--text)", fontFamily: "var(--font-body)", lineHeight: 1.65, margin: 0, fontStyle: "italic" }}>
-                  "{r.text}"
-                </p>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "auto" }}>
-                  <div>
-                    <p style={{ fontSize: "0.82rem", fontFamily: "var(--font-body)", fontWeight: 700, color: "var(--text)", margin: 0 }}>{r.name}</p>
-                    <p style={{ fontSize: "0.75rem", color: "var(--muted)", fontFamily: "var(--font-body)", margin: "2px 0 0" }}>{r.city}</p>
-                  </div>
-                  <span style={{ fontSize: "0.72rem", color: "var(--muted)", fontFamily: "var(--font-body)" }}>{r.date}</span>
+                <div
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "#666",
+                    fontFamily: "var(--font-body)",
+                    marginTop: 8,
+                    letterSpacing: "0.06em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {stat.sublabel}
                 </div>
               </div>
             ))}
@@ -1099,33 +1083,540 @@ function ProductContent() {
         </div>
       </section>
 
-      {/* ── YOU MIGHT ALSO LIKE (horizontal rail) ── */}
-      <section className="reveal" style={{ padding: "80px 0", background: "var(--bg)" }}>
+      {/* ── TECHNOLOGY BREAKDOWN — OVERLAP_BREAKOUT ── */}
+      <section
+        id="tech-breakdown"
+        className="reveal"
+        style={{
+          padding: isMobile ? "48px 0 48px" : "96px 0 120px",
+          background: "var(--bg)",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px" }}>
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 16, marginBottom: 32 }}>
-            <div>
+          <div style={{ marginBottom: 40 }}>
+            <div
+              style={{
+                fontSize: "0.7rem",
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+                color: "var(--accent)",
+                fontFamily: "var(--font-body)",
+                fontWeight: 600,
+                marginBottom: 12,
+              }}
+            >
+              Engineering Detail
+            </div>
+            <h2
+              style={{
+                fontFamily: "var(--font-heading)",
+                fontSize: "clamp(2rem,4vw,3.2rem)",
+                fontWeight: 700,
+                letterSpacing: "-0.02em",
+                color: "var(--text)",
+                margin: 0,
+                lineHeight: 1.1,
+              }}
+            >
+              Technology Breakdown
+            </h2>
+            {!isMobile && (
               <p
                 style={{
-                  fontSize: "0.7rem",
-                  letterSpacing: "0.18em",
-                  textTransform: "uppercase",
-                  color: "var(--primary)",
+                  fontSize: "0.9rem",
+                  color: "var(--muted)",
                   fontFamily: "var(--font-body)",
-                  fontWeight: 600,
-                  marginBottom: 8,
+                  marginTop: 12,
+                  lineHeight: 1.6,
+                  maxWidth: 480,
                 }}
               >
-                Complete Your Kit
+                Select a hotspot to explore the engineering behind every component.
               </p>
+            )}
+          </div>
+        </div>
+
+        {/* Full-width 16:9 image with hotspots — breakout */}
+        <div
+          style={{
+            width: "100%",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              aspectRatio: "16/9",
+              position: "relative",
+              background: "#ECEEF0",
+            }}
+          >
+            <img
+              src={displayImg}
+              alt={displayName + " technology breakdown"}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: "center",
+                display: "block",
+              }}
+            />
+            {/* Subtle scrim */}
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background: "linear-gradient(to right, rgba(244,249,252,0.08) 0%, rgba(244,249,252,0.0) 60%)",
+                pointerEvents: "none",
+              }}
+            />
+
+            {/* Hotspots */}
+            {techHotspots.map((hs) => (
+              <button
+                key={hs.id}
+                onClick={() => handleHotspot(hs.id)}
+                style={{
+                  position: "absolute",
+                  top: hs.top,
+                  left: hs.left,
+                  transform: "translate(-50%, -50%)",
+                  width: 32,
+                  height: 32,
+                  borderRadius: "50%",
+                  background:
+                    selectedHotspot === hs.id ? "var(--accent)" : "rgba(244,249,252,0.92)",
+                  border:
+                    selectedHotspot === hs.id
+                      ? "2px solid var(--accent)"
+                      : "1px solid rgba(26,26,26,0.3)",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "0.6rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.04em",
+                  color: selectedHotspot === hs.id ? "#fff" : "var(--text)",
+                  fontFamily: "var(--font-body)",
+                  opacity: selectedHotspot !== null && selectedHotspot !== hs.id ? 0.35 : 1,
+                  transition: "opacity 0.3s ease, background 0.25s ease, transform 0.2s ease",
+                  zIndex: 10,
+                  boxShadow: selectedHotspot === hs.id ? "0 0 0 6px rgba(201,164,102,0.25)" : "0 2px 8px rgba(0,0,0,0.12)",
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedHotspot !== hs.id) {
+                    e.currentTarget.style.transform = "translate(-50%, -50%) scale(1.15)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translate(-50%, -50%) scale(1)";
+                }}
+              >
+                {hs.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Slide-in panel */}
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            right: 0,
+            bottom: 0,
+            width: isMobile ? "90vw" : 420,
+            background: "var(--bg)",
+            borderLeft: "1px solid rgba(26,26,26,0.1)",
+            boxShadow: panelVisible ? "var(--shadow-xl)" : "none",
+            zIndex: 100,
+            transform: panelVisible ? "translateX(0)" : "translateX(100%)",
+            transition: "transform 0.35s cubic-bezier(0.4,0,0.2,1)",
+            padding: isMobile ? "32px 24px" : "48px 40px",
+            display: "flex",
+            flexDirection: "column",
+            overflowY: "auto",
+          }}
+        >
+          {/* Close button */}
+          <button
+            onClick={() => {
+              setSelectedHotspot(null);
+              setPanelVisible(false);
+            }}
+            style={{
+              alignSelf: "flex-end",
+              background: "none",
+              border: "1px solid rgba(26,26,26,0.15)",
+              borderRadius: "2px",
+              width: 36,
+              height: 36,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              marginBottom: 32,
+              color: "var(--text)",
+              fontSize: "1rem",
+              flexShrink: 0,
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+
+          {selectedFeatureData && (
+            <>
+              <div
+                style={{
+                  fontSize: "0.65rem",
+                  letterSpacing: "0.2em",
+                  textTransform: "uppercase",
+                  color: "var(--accent)",
+                  fontFamily: "var(--font-body)",
+                  fontWeight: 600,
+                  marginBottom: 16,
+                }}
+              >
+                Feature {selectedFeatureData.label}
+              </div>
+              <h3
+                style={{
+                  fontFamily: "var(--font-heading)",
+                  fontSize: "clamp(1.4rem,2.5vw,1.8rem)",
+                  fontWeight: 700,
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.2,
+                  color: "var(--text)",
+                  margin: "0 0 20px",
+                }}
+              >
+                {selectedFeatureData.title}
+              </h3>
+              <p
+                style={{
+                  fontSize: "0.95rem",
+                  lineHeight: 1.75,
+                  color: "var(--muted)",
+                  fontFamily: "var(--font-body)",
+                  margin: 0,
+                }}
+              >
+                {selectedFeatureData.body}
+              </p>
+            </>
+          )}
+        </div>
+
+        {/* Panel backdrop */}
+        {panelVisible && (
+          <div
+            onClick={() => {
+              setSelectedHotspot(null);
+              setPanelVisible(false);
+            }}
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(26,26,26,0.25)",
+              zIndex: 99,
+              cursor: "pointer",
+            }}
+          />
+        )}
+      </section>
+
+      {/* ── PRODUCT SPECS: ASYMMETRIC_SPLIT ── */}
+      <section
+        className="reveal"
+        style={{
+          background: "#F0F4F7",
+          padding: isMobile ? "48px 24px" : "96px 24px",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 1280,
+            margin: "0 auto",
+            display: "grid",
+            gridTemplateColumns: isMobile ? "1fr" : "60fr 40fr",
+            gap: isMobile ? 40 : 80,
+            alignItems: "center",
+          }}
+        >
+          <div>
+            <div
+              style={{
+                fontSize: "0.7rem",
+                letterSpacing: "0.2em",
+                textTransform: "uppercase",
+                color: "var(--accent)",
+                fontFamily: "var(--font-body)",
+                fontWeight: 600,
+                marginBottom: 16,
+              }}
+            >
+              Technical Specifications
+            </div>
+            <h2
+              style={{
+                fontFamily: "var(--font-heading)",
+                fontSize: "clamp(1.8rem,3vw,2.8rem)",
+                fontWeight: 700,
+                letterSpacing: "-0.02em",
+                color: "var(--text)",
+                margin: "0 0 40px",
+                lineHeight: 1.15,
+              }}
+            >
+              Every Detail,
+              <br />
+              Specified.
+            </h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+              {specs.map((spec, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    padding: "18px 0",
+                    borderBottom: "1px solid rgba(26,26,26,0.08)",
+                    gap: 16,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: "0.8rem",
+                      letterSpacing: "0.05em",
+                      textTransform: "uppercase",
+                      color: "var(--muted)",
+                      fontFamily: "var(--font-body)",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {spec.label}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "0.9rem",
+                      color: "var(--text)",
+                      fontFamily: "var(--font-body)",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {spec.value}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right: image */}
+          <div
+            style={{
+              overflow: "hidden",
+              borderRadius: "var(--radius-lg)",
+              boxShadow: "var(--shadow-lg)",
+            }}
+          >
+            <img
+              src={displayImg}
+              alt={displayName + " specifications"}
+              style={{
+                width: "100%",
+                aspectRatio: "4/5",
+                objectFit: "cover",
+                display: "block",
+                transition: "transform 0.7s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.04)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ── REVIEWS: HORIZONTAL_RAIL ── */}
+      <section
+        className="reveal"
+        style={{
+          padding: isMobile ? "48px 0" : "96px 0",
+          background: "var(--bg)",
+        }}
+      >
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px", marginBottom: 40 }}>
+          <div
+            style={{
+              fontSize: "0.7rem",
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+              color: "var(--accent)",
+              fontFamily: "var(--font-body)",
+              fontWeight: 600,
+              marginBottom: 12,
+            }}
+          >
+            Customer Reviews
+          </div>
+          <h2
+            style={{
+              fontFamily: "var(--font-heading)",
+              fontSize: "clamp(1.8rem,3vw,2.8rem)",
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+              color: "var(--text)",
+              margin: 0,
+              lineHeight: 1.15,
+            }}
+          >
+            Trusted by 4,800+ men.
+          </h2>
+        </div>
+
+        {/* Horizontal scrolling rail */}
+        <div
+          style={{
+            display: "flex",
+            gap: 20,
+            overflowX: "auto",
+            scrollSnapType: "x mandatory",
+            paddingLeft: 24,
+            paddingRight: 24,
+            paddingBottom: 8,
+            msOverflowStyle: "none",
+          }}
+        >
+          {reviews.map((r, i) => (
+            <div
+              key={i}
+              style={{
+                flex: "0 0 auto",
+                width: isMobile ? "82vw" : 340,
+                scrollSnapAlign: "start",
+                background: "#F0F4F7",
+                borderRadius: "var(--radius-lg)",
+                padding: "32px",
+                boxShadow: "var(--shadow-sm)",
+                display: "flex",
+                flexDirection: "column",
+                gap: 16,
+                transition: "transform 0.3s cubic-bezier(0.4,0,0.2,1), box-shadow 0.3s cubic-bezier(0.4,0,0.2,1)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-4px)";
+                e.currentTarget.style.boxShadow = "var(--shadow-xl)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "var(--shadow-sm)";
+              }}
+            >
+              <div style={{ display: "flex", gap: 2 }}>
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <StarIcon key={s} filled={s <= r.stars} />
+                ))}
+              </div>
+              <p
+                style={{
+                  fontSize: "0.92rem",
+                  lineHeight: 1.7,
+                  color: "var(--text)",
+                  fontFamily: "var(--font-body)",
+                  margin: 0,
+                  flex: 1,
+                }}
+              >
+                "{r.text}"
+              </p>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+                <div>
+                  <div
+                    style={{
+                      fontWeight: 600,
+                      fontSize: "0.85rem",
+                      color: "var(--text)",
+                      fontFamily: "var(--font-body)",
+                    }}
+                  >
+                    {r.name}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "0.75rem",
+                      color: "var(--muted)",
+                      fontFamily: "var(--font-body)",
+                    }}
+                  >
+                    {r.city}
+                  </div>
+                </div>
+                <span
+                  style={{
+                    fontSize: "0.7rem",
+                    color: "var(--muted)",
+                    fontFamily: "var(--font-body)",
+                    letterSpacing: "0.04em",
+                  }}
+                >
+                  {r.date}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── YOU MIGHT ALSO LIKE — MINIMAL_BELOW card pattern ── */}
+      <section
+        className="reveal"
+        style={{
+          padding: isMobile ? "48px 24px" : "96px 24px",
+          background: "#F0F4F7",
+        }}
+      >
+        <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-end",
+              justifyContent: "space-between",
+              marginBottom: 48,
+              flexWrap: "wrap",
+              gap: 16,
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  fontSize: "0.7rem",
+                  letterSpacing: "0.2em",
+                  textTransform: "uppercase",
+                  color: "var(--accent)",
+                  fontFamily: "var(--font-body)",
+                  fontWeight: 600,
+                  marginBottom: 12,
+                }}
+              >
+                Complete the Collection
+              </div>
               <h2
                 style={{
-                  fontSize: "clamp(1.6rem,2.5vw,2.4rem)",
                   fontFamily: "var(--font-heading)",
+                  fontSize: "clamp(1.8rem,3vw,2.8rem)",
                   fontWeight: 700,
-                  letterSpacing: "-0.025em",
-                  lineHeight: 1.05,
+                  letterSpacing: "-0.02em",
                   color: "var(--text)",
                   margin: 0,
+                  lineHeight: 1.15,
                 }}
               >
                 You Might Also Like
@@ -1135,139 +1626,455 @@ function ProductContent() {
               onClick={() => router.push("/shop")}
               style={{
                 background: "none",
-                border: "1px solid rgba(240,238,233,0.12)",
-                borderRadius: "var(--radius-md)",
-                color: "var(--muted)",
-                fontSize: "0.82rem",
+                border: "1px solid rgba(26,26,26,0.25)",
+                borderRadius: "2px",
+                padding: "12px 24px",
+                fontSize: "0.75rem",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "var(--text)",
                 fontFamily: "var(--font-body)",
                 fontWeight: 600,
-                padding: "10px 20px",
                 cursor: "pointer",
-                letterSpacing: "0.06em",
-                transition: "border-color 0.15s ease, color 0.15s ease",
-                whiteSpace: "nowrap",
+                transition: "transform 0.15s ease, border-color 0.15s ease",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "var(--primary)";
-                e.currentTarget.style.color = "var(--primary)";
+                e.currentTarget.style.transform = "scale(1.02)";
+                e.currentTarget.style.borderColor = "rgba(26,26,26,0.6)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "rgba(240,238,233,0.12)";
-                e.currentTarget.style.color = "var(--muted)";
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.borderColor = "rgba(26,26,26,0.25)";
               }}
             >
               View All
             </button>
           </div>
 
-          {/* Horizontal rail */}
+          {/* MINIMAL_BELOW product cards */}
           <div
             style={{
-              display: "flex",
-              gap: 20,
-              overflowX: "auto",
-              scrollSnapType: "x mandatory",
-              paddingBottom: 8,
-              msOverflowStyle: "none",
-              scrollbarWidth: "none",
+              display: "grid",
+              gridTemplateColumns: isMobile ? "repeat(auto-fill, minmax(180px, 1fr))" : "repeat(3,1fr)",
+              gap: 24,
             }}
           >
             {relatedProducts.map((p) => (
-              <div
+              <article
                 key={p.id}
-                style={{
-                  flex: "0 0 auto",
-                  width: "clamp(240px, 28vw, 300px)",
-                  scrollSnapAlign: "start",
-                  background: "var(--surface)",
-                  borderRadius: "var(--radius-lg)",
-                  border: "1px solid rgba(240,238,233,0.06)",
-                  overflow: "hidden",
-                  cursor: "pointer",
-                  transition: "border-color 0.2s ease, transform 0.3s cubic-bezier(0.4,0,0.2,1)",
-                }}
                 onClick={() =>
                   router.push(
                     `/product?name=${encodeURIComponent(p.name)}&price=${p.price}&img=${encodeURIComponent(p.img)}`
                   )
                 }
+                style={{
+                  cursor: "pointer",
+                  position: "relative",
+                  display: "flex",
+                  flexDirection: "column",
+                  background: "var(--bg)",
+                  borderRadius: "var(--radius-md)",
+                  overflow: "hidden",
+                  boxShadow: "var(--shadow-sm)",
+                  transition: "transform 0.3s cubic-bezier(0.4,0,0.2,1), box-shadow 0.3s cubic-bezier(0.4,0,0.2,1)",
+                }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(61,196,242,0.25)";
                   e.currentTarget.style.transform = "translateY(-4px)";
+                  e.currentTarget.style.boxShadow = "var(--shadow-xl)";
+                  const overlay = e.currentTarget.querySelector(".card-hover-overlay") as HTMLElement;
+                  if (overlay) {
+                    overlay.style.transform = "translateY(0)";
+                    overlay.style.opacity = "1";
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(240,238,233,0.06)";
                   e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "var(--shadow-sm)";
+                  const overlay = e.currentTarget.querySelector(".card-hover-overlay") as HTMLElement;
+                  if (overlay) {
+                    overlay.style.transform = "translateY(100%)";
+                    overlay.style.opacity = "0";
+                  }
                 }}
               >
-                <div style={{ overflow: "hidden", background: "var(--bg)" }}>
+                {/* Image wrapper — 4:5 ratio */}
+                <div
+                  style={{
+                    overflow: "hidden",
+                    position: "relative",
+                    background: "#ECEEF0",
+                  }}
+                >
                   <img
                     src={p.img}
                     alt={p.name}
                     style={{
                       width: "100%",
                       aspectRatio: "4/5",
-                      objectFit: "contain",
-                      background: "var(--bg)",
+                      objectFit: "cover",
                       display: "block",
-                      transition: "transform 0.6s ease",
+                      transition: "transform 0.7s ease",
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.04)")}
+                    onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
                     onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
                   />
-                </div>
-                <div style={{ padding: "16px 18px 20px" }}>
-                  <p style={{ fontSize: "0.85rem", fontFamily: "var(--font-body)", fontWeight: 700, color: "var(--text)", margin: 0, lineHeight: 1.35 }}>{p.name}</p>
-                  <p style={{ fontSize: "0.78rem", color: "var(--muted)", fontFamily: "var(--font-body)", marginTop: 4, lineHeight: 1.4 }}>{p.description.slice(0, 55)}…</p>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 12 }}>
-                    <span style={{ fontSize: "1.05rem", fontFamily: "var(--font-heading)", fontWeight: 700, color: "var(--accent)" }}>
-                      ₹{p.price.toLocaleString("en-IN")}
-                    </span>
-                    <button
-                      onClick={(ev) => {
-                        ev.stopPropagation();
-                        addItem({ id: String(p.id), name: p.name, price: p.price, quantity: 1, image: p.img });
-                      }}
+
+                  {/* Slide-up hover button overlay */}
+                  <div
+                    className="card-hover-overlay"
+                    style={{
+                      position: "absolute",
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      background: "var(--text)",
+                      padding: "14px 20px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      transform: "translateY(100%)",
+                      opacity: 0,
+                      transition: "transform 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.28s ease",
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      addItem({
+                        id: crypto.randomUUID(),
+                        name: p.name,
+                        price: p.price,
+                        quantity: 1,
+                        image: p.img,
+                      });
+                    }}
+                  >
+                    <span
                       style={{
-                        background: "var(--primary)",
+                        fontSize: "0.72rem",
+                        letterSpacing: "0.14em",
+                        textTransform: "uppercase",
                         color: "var(--bg)",
-                        border: "none",
-                        borderRadius: "var(--radius-sm)",
-                        padding: "8px 14px",
-                        fontSize: "0.75rem",
-                        fontWeight: 700,
                         fontFamily: "var(--font-body)",
-                        cursor: "pointer",
-                        letterSpacing: "0.04em",
-                        whiteSpace: "nowrap",
-                        transition: "transform 0.15s ease",
+                        fontWeight: 700,
                       }}
-                      onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.04)")}
-                      onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
                     >
                       Add to Cart
-                    </button>
+                    </span>
                   </div>
                 </div>
-              </div>
+
+                {/* Card info — minimal below */}
+                <div style={{ padding: "16px 20px 20px" }}>
+                  <h3
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontSize: "0.875rem",
+                      fontWeight: 500,
+                      color: "var(--text)",
+                      margin: "0 0 6px",
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {p.name}
+                  </h3>
+                  <p
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontSize: "0.875rem",
+                      fontWeight: 500,
+                      color: "#999",
+                      margin: 0,
+                    }}
+                  >
+                    ₹{p.price.toLocaleString("en-IN")}
+                  </p>
+                </div>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── LIGHTBOX MODAL ── */}
+      {/* ── BRAND MANIFESTO: FULL_BLEED_BAND ── */}
+      <section
+        className="reveal"
+        style={{
+          background: "var(--text)",
+          padding: isMobile ? "64px 24px" : "120px 24px",
+          textAlign: "center",
+        }}
+      >
+        <div style={{ maxWidth: 700, margin: "0 auto" }}>
+          <div
+            style={{
+              fontSize: "0.7rem",
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+              color: "var(--accent)",
+              fontFamily: "var(--font-body)",
+              fontWeight: 600,
+              marginBottom: 24,
+            }}
+          >
+            Our Commitment
+          </div>
+          <h2
+            style={{
+              fontFamily: "var(--font-heading)",
+              fontSize: "clamp(2rem,4vw,3.2rem)",
+              fontWeight: 700,
+              letterSpacing: "-0.025em",
+              lineHeight: 1.15,
+              color: "#F4F9FC",
+              margin: "0 0 28px",
+            }}
+          >
+            We sell handsomeness.
+            <br />
+            Nothing less.
+          </h2>
+          <p
+            style={{
+              fontSize: "1rem",
+              lineHeight: 1.75,
+              color: "rgba(244,249,252,0.6)",
+              fontFamily: "var(--font-body)",
+              margin: "0 0 40px",
+            }}
+          >
+            Every product in our range is specified to a single standard: does it perform? No excess, no fluff — just engineering that delivers precise results, every single day.
+          </p>
+          <button
+            onClick={() => router.push("/shop")}
+            style={{
+              height: 52,
+              padding: "0 36px",
+              background: "transparent",
+              border: "1px solid rgba(244,249,252,0.35)",
+              borderRadius: "2px",
+              color: "#F4F9FC",
+              fontFamily: "var(--font-body)",
+              fontWeight: 600,
+              fontSize: "0.8rem",
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              cursor: "pointer",
+              transition: "transform 0.15s ease, border-color 0.15s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "scale(1.02)";
+              e.currentTarget.style.borderColor = "rgba(244,249,252,0.7)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "scale(1)";
+              e.currentTarget.style.borderColor = "rgba(244,249,252,0.35)";
+            }}
+          >
+            Explore the Range
+          </button>
+        </div>
+      </section>
+
+      {/* ── NEWSLETTER: FULL_BLEED_BAND ── */}
+      <section
+        className="reveal"
+        style={{
+          background: "var(--bg)",
+          padding: isMobile ? "48px 24px" : "96px 24px",
+          borderTop: "1px solid rgba(26,26,26,0.06)",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 560,
+            margin: "0 auto",
+            textAlign: "center",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "0.7rem",
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+              color: "var(--accent)",
+              fontFamily: "var(--font-body)",
+              fontWeight: 600,
+              marginBottom: 16,
+            }}
+          >
+            Stay Informed
+          </div>
+          <h2
+            style={{
+              fontFamily: "var(--font-heading)",
+              fontSize: "clamp(1.6rem,3vw,2.4rem)",
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+              color: "var(--text)",
+              margin: "0 0 16px",
+              lineHeight: 1.2,
+            }}
+          >
+            New arrivals. No noise.
+          </h2>
+          <p
+            style={{
+              fontSize: "0.9rem",
+              color: "var(--muted)",
+              fontFamily: "var(--font-body)",
+              lineHeight: 1.65,
+              margin: "0 0 32px",
+            }}
+          >
+            Product launches, performance guides, and grooming specifications delivered to your inbox.
+          </p>
+
+          {subscribed ? (
+            <div
+              style={{
+                padding: "18px 32px",
+                background: "rgba(61,196,242,0.08)",
+                border: "1px solid rgba(61,196,242,0.25)",
+                borderRadius: "2px",
+                color: "var(--text)",
+                fontFamily: "var(--font-body)",
+                fontSize: "0.9rem",
+              }}
+            >
+              You're subscribed. Expect precision.
+            </div>
+          ) : (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (email.trim()) {
+                  setSubscribed(true);
+                }
+              }}
+              style={{ display: "flex", gap: 0, maxWidth: 440, margin: "0 auto" }}
+            >
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com"
+                required
+                style={{
+                  flex: 1,
+                  height: 52,
+                  padding: "0 20px",
+                  background: "var(--bg)",
+                  border: "1px solid rgba(26,26,26,0.2)",
+                  borderRight: "none",
+                  borderRadius: "2px 0 0 2px",
+                  color: "var(--text)",
+                  fontFamily: "var(--font-body)",
+                  fontSize: "0.9rem",
+                  outline: "none",
+                }}
+              />
+              <button
+                type="submit"
+                style={{
+                  height: 52,
+                  padding: "0 24px",
+                  background: "var(--text)",
+                  color: "var(--bg)",
+                  border: "none",
+                  borderRadius: "0 2px 2px 0",
+                  fontFamily: "var(--font-body)",
+                  fontWeight: 700,
+                  fontSize: "0.78rem",
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  cursor: "pointer",
+                  transition: "transform 0.15s ease",
+                  whiteSpace: "nowrap",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+              >
+                Subscribe
+              </button>
+            </form>
+          )}
+        </div>
+      </section>
+
+      <Footer />
+
+      {/* ── STICKY MOBILE ADD-TO-CART BAR ── */}
+      {isMobile && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            padding: "12px 20px",
+            background: "var(--bg)",
+            borderTop: "1px solid rgba(26,26,26,0.1)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            zIndex: 50,
+            gap: 12,
+          }}
+        >
+          <div>
+            <div
+              style={{
+                fontWeight: 800,
+                fontSize: "1.15rem",
+                color: "var(--text)",
+                fontFamily: "var(--font-heading)",
+                letterSpacing: "-0.02em",
+              }}
+            >
+              ₹{displayPrice.toLocaleString("en-IN")}
+            </div>
+            <div style={{ fontSize: "0.7rem", color: "var(--muted)", fontFamily: "var(--font-body)" }}>
+              incl. taxes
+            </div>
+          </div>
+          <button
+            onClick={handleAddToCart}
+            style={{
+              flex: 1,
+              maxWidth: 220,
+              height: 48,
+              background: "var(--text)",
+              color: "var(--bg)",
+              border: "none",
+              borderRadius: "2px",
+              fontFamily: "var(--font-body)",
+              fontWeight: 700,
+              fontSize: "0.78rem",
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              cursor: "pointer",
+              transition: "transform 0.15s ease",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          >
+            {addedState === "added" ? "✓ Added" : "Add to Cart"}
+          </button>
+        </div>
+      )}
+
+      {/* ── LIGHTBOX ── */}
       {lightboxOpen && (
         <div
           onClick={() => setLightboxOpen(false)}
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0,0,0,0.88)",
-            zIndex: 999,
+            background: "rgba(244,249,252,0.95)",
+            zIndex: 200,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: 24,
+            cursor: "zoom-out",
           }}
         >
           <button
@@ -1276,106 +2083,54 @@ function ProductContent() {
               position: "absolute",
               top: 24,
               right: 24,
+              background: "none",
+              border: "1px solid rgba(26,26,26,0.2)",
+              borderRadius: "2px",
               width: 44,
               height: 44,
-              background: "rgba(240,238,233,0.1)",
-              border: "1px solid rgba(240,238,233,0.15)",
-              borderRadius: "50%",
-              color: "var(--text)",
-              fontSize: "1.2rem",
-              cursor: "pointer",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              cursor: "pointer",
+              color: "var(--text)",
             }}
           >
-            ✕
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
           <img
             src={displayImg}
             alt={displayName}
             style={{
               maxWidth: "90vw",
-              maxHeight: "85vh",
+              maxHeight: "90vh",
               objectFit: "contain",
-              borderRadius: "var(--radius-md)",
+              boxShadow: "var(--shadow-xl)",
             }}
             onClick={(e) => e.stopPropagation()}
           />
         </div>
       )}
 
-      {/* ── STICKY MOBILE BOTTOM BAR ── */}
-      {isMobile && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            padding: "12px 16px",
-            background: "var(--surface)",
-            borderTop: "1px solid rgba(240,238,233,0.1)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 12,
-            zIndex: 50,
-          }}
-        >
-          <span style={{ fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: "1.3rem", color: "var(--accent)" }}>
-            ₹{displayPrice.toLocaleString("en-IN")}
-          </span>
-          <button
-            onClick={handleAddToCart}
-            style={{
-              flex: 1,
-              height: 48,
-              background: addedState === "added" ? "rgba(61,196,242,0.15)" : "var(--primary)",
-              color: addedState === "added" ? "var(--primary)" : "var(--bg)",
-              border: addedState === "added" ? "1px solid var(--primary)" : "none",
-              borderRadius: "var(--radius-md)",
-              fontSize: "0.95rem",
-              fontWeight: 700,
-              fontFamily: "var(--font-body)",
-              cursor: "pointer",
-              transition: "background 0.2s ease",
-              letterSpacing: "0.04em",
-            }}
-          >
-            {addedState === "added" ? "✓ Added" : "Add to Cart"}
-          </button>
-          <button
-            onClick={handleBuyNow}
-            style={{
-              flex: 1,
-              height: 48,
-              background: "var(--accent)",
-              color: "var(--bg)",
-              border: "none",
-              borderRadius: "var(--radius-md)",
-              fontSize: "0.95rem",
-              fontWeight: 700,
-              fontFamily: "var(--font-body)",
-              cursor: "pointer",
-              letterSpacing: "0.04em",
-            }}
-          >
-            Buy Now
-          </button>
-        </div>
-      )}
-
-      <div style={{ paddingBottom: isMobile ? 80 : 0 }}>
-        <Footer />
-      </div>
+      {/* ── MARQUEE KEYFRAME via style injection — only safe pattern in React 18 ── */}
+      <style>{`
+        @keyframes marquee {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
+        }
+        .will-reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+        .visible { opacity: 1 !important; transform: translateY(0) !important; }
+        ::-webkit-scrollbar { display: none; }
+      `}</style>
     </div>
   );
 }
 
 export default function ProductPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: "100vh", background: "var(--bg)" }} />}>
+    <Suspense fallback={<div style={{ background: "var(--bg)", minHeight: "100vh" }} />}>
       <ProductContent />
     </Suspense>
   );

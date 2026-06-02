@@ -1,6 +1,6 @@
 "use client";
 export const dynamic = "force-dynamic";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "../components/CartContext";
 import Navbar from "../components/Navbar";
@@ -52,11 +52,17 @@ export default function HomePage() {
   const router = useRouter();
   const { addItem } = useCart();
   const [selectedFeature, setSelectedFeature] = useState<number | null>(null);
-  const [addedId, setAddedId] = useState<string | null>(null);
+  const [addedId, setAddedId] = useState<number | null>(null);
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const marqueeRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     const els = document.querySelectorAll(".reveal");
@@ -102,157 +108,75 @@ export default function HomePage() {
     setEmail("");
   }
 
-  return (
-    <>
-      <style>{`
-        @keyframes marquee-scroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .marquee-inner {
-          display: flex;
-          width: max-content;
-          animation: marquee-scroll 22s linear infinite;
-        }
-        .marquee-inner:hover {
-          animation-play-state: paused;
-        }
-        .will-reveal {
-          opacity: 0;
-          transform: translateY(28px);
-          transition: opacity 0.55s ease-out, transform 0.55s ease-out;
-        }
-        .visible {
-          opacity: 1 !important;
-          transform: translateY(0) !important;
-        }
-        .tech-panel {
-          position: fixed;
-          top: 0;
-          right: 0;
-          height: 100%;
-          width: min(400px, 92vw);
-          background: var(--surface);
-          border-left: 1px solid rgba(61,196,242,0.15);
-          z-index: 200;
-          padding: 48px 32px;
-          transform: translateX(100%);
-          transition: transform 350ms ease-out;
-          overflow-y: auto;
-        }
-        .tech-panel.open {
-          transform: translateX(0);
-        }
-        .tech-panel-backdrop {
-          display: none;
-          position: fixed;
-          inset: 0;
-          background: rgba(0,0,0,0.55);
-          z-index: 199;
-        }
-        .tech-panel-backdrop.open {
-          display: block;
-        }
-        .hotspot-btn {
-          position: absolute;
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          background: var(--primary);
-          border: 2px solid var(--bg);
-          color: var(--bg);
-          font-size: 11px;
-          font-weight: 700;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: transform 0.2s ease, opacity 0.2s ease;
-          transform: translate(-50%, -50%);
-          font-family: var(--font-body);
-          z-index: 10;
-        }
-        .hotspot-btn:hover {
-          transform: translate(-50%, -50%) scale(1.18);
-        }
-        .hotspot-btn.dimmed {
-          opacity: 0.35;
-        }
-        .hotspot-btn.active {
-          background: var(--accent);
-          border-color: var(--accent);
-          color: #fff;
-          transform: translate(-50%, -50%) scale(1.15);
-        }
-        .product-rail::-webkit-scrollbar { display: none; }
-        .product-rail { -ms-overflow-style: none; scrollbar-width: none; }
-        @media (max-width: 767px) {
-          .hero-grid { grid-template-columns: 1fr !important; min-height: auto !important; }
-          .hero-left { min-height: 72vw !important; }
-          .hero-right { padding: 40px 24px !important; }
-          .bento-grid { grid-template-columns: 1fr 1fr !important; }
-          .bento-wide { grid-column: span 2 !important; }
-          .manifesto-grid { grid-template-columns: 1fr !important; }
-          .manifesto-img { display: none; }
-        }
-      `}</style>
+  const selectedTech = techFeatures.find((f) => f.id === selectedFeature);
 
+  return (
+    <div style={{ background: "var(--bg)", color: "var(--text)", fontFamily: "var(--font-body)" }}>
+      {/* Global animation styles injected via a single class rule approach using useEffect-friendly inline trick */}
       <Navbar />
 
-      {/* ── HERO: Asymmetric Split ── */}
+      {/* ── HERO: Split 60/40 — dark image panel left, light copy panel right ── */}
       <section
-        className="hero-grid"
         style={{
-          display: "grid",
-          gridTemplateColumns: "60fr 40fr",
+          display: isMobile ? "flex" : "grid",
+          flexDirection: isMobile ? "column" : undefined,
+          gridTemplateColumns: isMobile ? undefined : "60fr 40fr",
           minHeight: "100vh",
-          background: "var(--bg)",
+          position: "relative",
+          overflow: "hidden",
         }}
       >
-        {/* Left: dark panel with product image at diagonal */}
+        {/* LEFT: Dark panel with portrait product image bleeding into right */}
         <div
-          className="hero-left"
           style={{
             position: "relative",
-            background: "var(--bg)",
+            background: "#1a1a1a",
             overflow: "hidden",
-            minHeight: "60vmin",
+            minHeight: isMobile ? "62vw" : undefined,
+            width: isMobile ? "100%" : undefined,
           }}
         >
-          {/* Subtle top-left accent rule */}
-          <div
+          <img
+            src="/product-1.jpg"
+            alt="Philips Series 3000/5000 Beard Trimmer — precision trimming"
             style={{
               position: "absolute",
-              top: 0,
-              left: 0,
-              width: "3px",
+              inset: 0,
+              width: "100%",
               height: "100%",
-              background: "var(--primary)",
-              opacity: 0.4,
+              objectFit: "cover",
+              objectPosition: "center top",
+              transform: isMobile ? undefined : "translateX(40px)",
+              zIndex: 1,
             }}
           />
-          {/* Product image — diagonal, bleeds off bottom-left */}
+          {/* Subtle right-edge fade so image bleeds into copy panel */}
+          {!isMobile && (
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                right: 0,
+                width: "160px",
+                height: "100%",
+                background: "linear-gradient(to left, #1a1a1a 0%, transparent 100%)",
+                zIndex: 2,
+              }}
+            />
+          )}
+          {/* Dark gradient at bottom for trust strip legibility */}
           <div
             style={{
               position: "absolute",
-              bottom: "-8%",
-              left: "-6%",
-              width: "90%",
-              transform: "rotate(-18deg)",
-              transformOrigin: "bottom left",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: "200px",
+              background: "linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 100%)",
+              zIndex: 3,
             }}
-          >
-            <img
-              src="/product-1.jpg"
-              alt="Philips Series 3000/5000 Beard Trimmer angled view"
-              style={{
-                width: "100%",
-                objectFit: "contain",
-                filter: "drop-shadow(0 24px 48px rgba(0,0,0,0.6))",
-              }}
-            />
-          </div>
-          {/* Trust strip bottom-left */}
+          />
+          {/* Trust strip */}
           <div
             style={{
               position: "absolute",
@@ -260,82 +184,130 @@ export default function HomePage() {
               left: "32px",
               display: "flex",
               flexDirection: "column",
-              gap: "6px",
-              zIndex: 5,
+              gap: "8px",
+              zIndex: 4,
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              {[1,2,3,4,5].map(i => (
-                <svg key={i} width="12" height="12" viewBox="0 0 12 12" fill="none">
-                  <polygon points="6,0.5 7.5,4.5 12,4.8 8.8,7.6 9.9,12 6,9.5 2.1,12 3.2,7.6 0,4.8 4.5,4.5" fill="var(--accent)"/>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <svg key={i} width="13" height="13" viewBox="0 0 12 12" fill="none">
+                  <polygon
+                    points="6,0.5 7.5,4.5 12,4.8 8.8,7.6 9.9,12 6,9.5 2.1,12 3.2,7.6 0,4.8 4.5,4.5"
+                    fill="var(--accent)"
+                  />
                 </svg>
               ))}
-              <span style={{ color: "var(--muted)", fontSize: "12px", fontFamily: "var(--font-body)" }}>
+              <span
+                style={{
+                  color: "rgba(255,255,255,0.7)",
+                  fontSize: "12px",
+                  fontFamily: "var(--font-body)",
+                  marginLeft: "4px",
+                }}
+              >
                 4.7 · 4,800+ verified buyers
               </span>
             </div>
-            <span style={{ color: "var(--muted)", fontSize: "11px", fontFamily: "var(--font-body)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+            <span
+              style={{
+                color: "rgba(255,255,255,0.5)",
+                fontSize: "11px",
+                fontFamily: "var(--font-body)",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+              }}
+            >
               Free delivery above ₹499
             </span>
           </div>
         </div>
 
-        {/* Right: headline panel */}
+        {/* RIGHT: Light copy panel — product image bleeds ~80px from left via negative margin */}
         <div
-          className="hero-right"
           style={{
-            background: "var(--surface)",
+            background: "var(--bg)",
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
-            padding: "80px 56px 80px 48px",
+            padding: isMobile ? "48px 24px 56px" : "80px 56px 80px 80px",
             position: "relative",
+            zIndex: 5,
+            marginLeft: isMobile ? 0 : "-80px",
+            borderRadius: isMobile ? 0 : "0 0 0 0",
           }}
         >
+          {/* Vertical accent rule */}
+          <div
+            style={{
+              position: "absolute",
+              left: isMobile ? 0 : "0",
+              top: isMobile ? undefined : "10%",
+              bottom: isMobile ? undefined : "10%",
+              width: "2px",
+              background: "var(--accent)",
+              opacity: 0.6,
+              height: isMobile ? "2px" : undefined,
+              width: isMobile ? "48px" : "2px",
+              top: isMobile ? "0" : "10%",
+              left: isMobile ? "24px" : "0",
+            }}
+          />
+
           <span
             style={{
               display: "block",
               fontFamily: "var(--font-body)",
-              fontSize: "11px",
+              fontSize: "10px",
               fontWeight: 700,
-              letterSpacing: "0.2em",
+              letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: "var(--primary)",
-              marginBottom: "20px",
+              color: "var(--accent)",
+              marginBottom: "24px",
+              paddingLeft: isMobile ? 0 : "0",
             }}
           >
             Men's Grooming
           </span>
+
           <h1
             style={{
               fontFamily: "var(--font-heading)",
-              fontSize: "clamp(2.6rem, 5vw, 4.8rem)",
-              fontWeight: 700,
-              letterSpacing: "-0.025em",
-              lineHeight: 0.97,
+              fontSize: "clamp(3.5rem, 8vw, 7rem)",
+              fontWeight: 800,
+              letterSpacing: "-0.03em",
+              lineHeight: 0.95,
               color: "var(--text)",
-              margin: 0,
+              margin: "0 0 28px",
               textTransform: "uppercase",
             }}
           >
             PRECISION<br />
-            <span style={{ color: "var(--primary)" }}>IN</span><br />
+            IN<br />
             EVERY<br />
             TRIM.
           </h1>
-          {/* Gold accent rule */}
-          <div style={{ width: "48px", height: "2px", background: "var(--accent)", margin: "28px 0" }} />
+
+          {/* Brass rule */}
+          <div
+            style={{
+              width: "40px",
+              height: "2px",
+              background: "var(--accent)",
+              marginBottom: "24px",
+            }}
+          />
+
           <p
             style={{
               fontFamily: "var(--font-body)",
               fontSize: "15px",
-              lineHeight: 1.65,
+              lineHeight: 1.7,
               color: "var(--muted)",
-              maxWidth: "320px",
-              margin: "0 0 36px",
+              maxWidth: "300px",
+              margin: "0 0 32px",
             }}
           >
-            Engineering-grade stainless steel blades. 20 precision length settings. USB-rechargeable for 90 minutes of cordless performance.
+            Engineering-grade stainless steel blades. 20 precision length settings. USB-C rechargeable for 90 minutes of cordless performance.
           </p>
 
           {/* Spec chips */}
@@ -345,14 +317,14 @@ export default function HomePage() {
                 key={chip}
                 style={{
                   fontFamily: "var(--font-body)",
-                  fontSize: "11px",
+                  fontSize: "10px",
                   fontWeight: 600,
-                  letterSpacing: "0.1em",
+                  letterSpacing: "0.12em",
                   textTransform: "uppercase",
-                  padding: "6px 14px",
-                  border: "1px solid rgba(61,196,242,0.3)",
+                  padding: "6px 12px",
+                  border: "1px solid rgba(201,164,102,0.35)",
                   borderRadius: "2px",
-                  color: "var(--primary)",
+                  color: "var(--text)",
                   background: "transparent",
                   whiteSpace: "nowrap",
                 }}
@@ -364,25 +336,25 @@ export default function HomePage() {
 
           <button
             onClick={() => router.push("/shop")}
-            onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.02)")}
-            onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
-            onMouseDown={e => (e.currentTarget.style.transform = "scale(0.98)")}
-            onMouseUp={e => (e.currentTarget.style.transform = "scale(1.02)")}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+            onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.98)")}
+            onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
             style={{
               fontFamily: "var(--font-body)",
-              fontSize: "15px",
-              fontWeight: 600,
-              letterSpacing: "0.04em",
-              background: "var(--primary)",
+              fontSize: "14px",
+              fontWeight: 700,
+              letterSpacing: "0.06em",
+              background: "var(--text)",
               color: "var(--bg)",
               border: "none",
               borderRadius: "2px",
               padding: "0 36px",
-              height: "52px",
+              height: "56px",
               cursor: "pointer",
               alignSelf: "flex-start",
               transition: "transform 0.15s ease",
-              whiteSpace: "nowrap",
+              textTransform: "uppercase",
             }}
           >
             Discover the Series
@@ -390,8 +362,8 @@ export default function HomePage() {
 
           <div style={{ marginTop: "20px", display: "flex", alignItems: "center", gap: "8px" }}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <circle cx="8" cy="8" r="7" stroke="var(--muted)" strokeWidth="1.2"/>
-              <path d="M5 8l2 2 4-4" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <circle cx="8" cy="8" r="7" stroke="var(--muted)" strokeWidth="1.2" />
+              <path d="M5 8l2 2 4-4" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--muted)" }}>
               Trusted by over 1 Million users worldwide
@@ -400,535 +372,805 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── BENTO SPEC GRID ── */}
+      {/* ── FEATURE TRIO: BENTO_MOSAIC — 2fr 1fr 1fr grid ── */}
       <section
         className="reveal"
         style={{
           background: "var(--bg)",
-          padding: "80px 24px",
+          padding: "clamp(4rem, 8vw, 8rem) clamp(1.5rem, 5vw, 5rem)",
         }}
       >
-        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-          <span
-            style={{
-              display: "block",
-              fontFamily: "var(--font-body)",
-              fontSize: "11px",
-              fontWeight: 700,
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              color: "var(--muted)",
-              marginBottom: "12px",
-            }}
-          >
-            Engineered Advantage
-          </span>
-          <h2
-            style={{
-              fontFamily: "var(--font-heading)",
-              fontSize: "clamp(1.8rem, 3.5vw, 3rem)",
-              fontWeight: 700,
-              letterSpacing: "-0.02em",
-              color: "var(--text)",
-              margin: "0 0 40px",
-            }}
-          >
-            Built Different.
-          </h2>
-
-          <div
-            className="bento-grid"
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))",
-              gridTemplateRows: "auto auto",
-              gap: "16px",
-            }}
-          >
-            {/* Wide cell — macro blade image */}
-            <div
-              className="bento-wide"
+        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+          <div style={{ marginBottom: "40px" }}>
+            <span
               style={{
-                gridColumn: "span 2",
-                gridRow: "span 2",
-                position: "relative",
-                overflow: "hidden",
-                borderRadius: "4px",
-                background: "var(--surface)",
-                minHeight: "320px",
+                fontFamily: "var(--font-body)",
+                fontSize: "10px",
+                fontWeight: 700,
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+                color: "var(--accent)",
               }}
             >
-              <img
-                src="/product-1.jpg"
-                alt="Close-up of trimmer blade teeth"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  objectPosition: "top center",
-                  position: "absolute",
-                  inset: 0,
-                  opacity: 0.55,
-                  transition: "transform 0.6s ease",
-                }}
-                onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.04)")}
-                onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  background: "linear-gradient(to top, rgba(19,20,21,0.92) 0%, rgba(19,20,21,0.3) 60%)",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "flex-end",
-                  padding: "32px",
-                }}
-              >
-                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" style={{ marginBottom: "16px" }}>
-                  <path d="M8 20h24M20 8v24" stroke="var(--primary)" strokeWidth="2" strokeLinecap="round"/>
-                  <rect x="14" y="14" width="12" height="12" rx="1" stroke="var(--accent)" strokeWidth="1.5"/>
-                </svg>
-                <h3 style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(1.4rem,2.5vw,2rem)", fontWeight: 700, color: "var(--text)", margin: "0 0 10px", letterSpacing: "-0.02em" }}>
-                  Precision Blades
-                </h3>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", lineHeight: 1.6, color: "var(--muted)", margin: 0, maxWidth: "280px" }}>
-                  Self-sharpening stainless steel blades engineered for clean edge definition, trim after trim.
-                </p>
-              </div>
-            </div>
-
-            {/* Stat cell: 20 Settings */}
-            {[
-              { stat: "20", unit: "Settings", desc: "Length precision from 0.5 mm to 10 mm" },
-              { stat: "90", unit: "Min Runtime", desc: "Full charge lasts an entire week of daily trims" },
-              { stat: "IPX5", unit: "Washable", desc: "Rinse under running water for effortless cleaning" },
-            ].map((item, i) => (
-              <div
-                key={i}
-                style={{
-                  background: "var(--surface)",
-                  borderRadius: "4px",
-                  padding: "28px 24px",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  transition: "transform 0.25s ease",
-                  cursor: "default",
-                  border: "1px solid rgba(240,238,233,0.06)",
-                }}
-                onMouseEnter={e => (e.currentTarget.style.transform = "translateY(-4px)")}
-                onMouseLeave={e => (e.currentTarget.style.transform = "translateY(0)")}
-              >
-                <div>
-                  <span
-                    style={{
-                      fontFamily: "var(--font-heading)",
-                      fontSize: "clamp(2.2rem, 4vw, 3rem)",
-                      fontWeight: 700,
-                      color: "var(--primary)",
-                      letterSpacing: "-0.03em",
-                      lineHeight: 1,
-                    }}
-                  >
-                    {item.stat}
-                  </span>
-                  <span
-                    style={{
-                      display: "block",
-                      fontFamily: "var(--font-body)",
-                      fontSize: "11px",
-                      fontWeight: 700,
-                      letterSpacing: "0.14em",
-                      textTransform: "uppercase",
-                      color: "var(--accent)",
-                      marginTop: "4px",
-                    }}
-                  >
-                    {item.unit}
-                  </span>
-                </div>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "var(--muted)", lineHeight: 1.55, margin: "16px 0 0" }}>
-                  {item.desc}
-                </p>
-              </div>
-            ))}
+              Why it performs
+            </span>
+            <h2
+              style={{
+                fontFamily: "var(--font-heading)",
+                fontSize: "clamp(1.8rem, 3vw, 2.8rem)",
+                fontWeight: 600,
+                letterSpacing: "-0.02em",
+                color: "var(--text)",
+                marginTop: "8px",
+                textTransform: "uppercase",
+              }}
+            >
+              Engineered to outlast.
+            </h2>
           </div>
-        </div>
-      </section>
 
-      {/* ── MARQUEE TICKER ── */}
-      <div
-        style={{
-          background: "var(--primary)",
-          overflow: "hidden",
-          padding: "14px 0",
-        }}
-      >
-        <div className="marquee-inner">
-          {[...Array(2)].map((_, rep) => (
-            <div key={rep} style={{ display: "flex", alignItems: "center", gap: "0" }}>
-              {[
-                "PRECISION TRIMMING",
-                "MATTE FINISH BODY",
-                "SELF-SHARPENING BLADES",
-                "CORDLESS FREEDOM",
-                "USB-C RECHARGEABLE",
-                "20 LENGTH SETTINGS",
-                "90-MIN RUNTIME",
-                "IPX5 WASHABLE",
-              ].map((item, i) => (
-                <span key={i} style={{ display: "flex", alignItems: "center" }}>
-                  <span
-                    style={{
-                      fontFamily: "var(--font-body)",
-                      fontSize: "12px",
-                      fontWeight: 700,
-                      letterSpacing: "0.18em",
-                      textTransform: "uppercase",
-                      color: "var(--bg)",
-                      padding: "0 32px",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {item}
-                  </span>
-                  <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--accent)", flexShrink: 0 }} />
-                </span>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ── TECHNOLOGY BREAKDOWN (Visual Fingerprint) ── */}
-      <section
-        id="technology"
-        className="reveal"
-        style={{
-          background: "var(--text)",
-          padding: "96px 24px",
-          position: "relative",
-        }}
-      >
-        {/* Slide-in panel backdrop */}
-        <div
-          className={`tech-panel-backdrop${selectedFeature !== null ? " open" : ""}`}
-          onClick={() => setSelectedFeature(null)}
-        />
-        {/* Slide-in panel */}
-        <div className={`tech-panel${selectedFeature !== null ? " open" : ""}`}>
-          <button
-            onClick={() => setSelectedFeature(null)}
+          {/* Bento grid: 2fr 1fr 1fr, rows auto, tall tile left spans 2 rows */}
+          <div
             style={{
-              position: "absolute",
-              top: "20px",
-              right: "20px",
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              color: "var(--muted)",
-              fontFamily: "var(--font-body)",
-              fontSize: "22px",
-              lineHeight: 1,
-              padding: "8px",
+              display: "grid",
+              gridTemplateColumns: isMobile ? "1fr" : "2fr 1fr 1fr",
+              gridTemplateRows: isMobile ? undefined : "auto auto",
+              gap: "1px",
+              background: "#D0CEC9",
+              border: "1px solid #D0CEC9",
+              borderRadius: "var(--radius-md)",
+              overflow: "hidden",
             }}
           >
-            ×
-          </button>
-          {selectedFeature !== null && (() => {
-            const f = techFeatures.find(x => x.id === selectedFeature);
-            if (!f) return null;
-            return (
-              <>
-                <span
+            {/* Tall left tile spanning 2 rows */}
+            <div
+              style={{
+                gridRow: isMobile ? undefined : "span 2",
+                background: "#F5F3EF",
+                padding: "clamp(2rem, 4vw, 3rem)",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                minHeight: isMobile ? "200px" : "400px",
+                position: "relative",
+                overflow: "hidden",
+              }}
+            >
+              <div>
+                <div
                   style={{
-                    display: "block",
-                    fontFamily: "var(--font-body)",
-                    fontSize: "11px",
-                    fontWeight: 700,
-                    letterSpacing: "0.2em",
-                    textTransform: "uppercase",
-                    color: "var(--primary)",
-                    marginBottom: "16px",
+                    width: "40px",
+                    height: "40px",
+                    border: "1.5px solid var(--text)",
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: "24px",
                   }}
                 >
-                  Feature {f.label}
-                </span>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text)" strokeWidth="1.5">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
                 <h3
                   style={{
                     fontFamily: "var(--font-heading)",
-                    fontSize: "clamp(1.4rem, 2.5vw, 1.8rem)",
-                    fontWeight: 700,
-                    color: "var(--text)",
+                    fontSize: "clamp(1.4rem, 2.5vw, 2rem)",
+                    fontWeight: 600,
                     letterSpacing: "-0.02em",
-                    lineHeight: 1.2,
-                    margin: "0 0 20px",
+                    color: "var(--text)",
+                    marginBottom: "16px",
+                    textTransform: "uppercase",
                   }}
                 >
-                  {f.title}
+                  Precision Blade Architecture
                 </h3>
-                <div style={{ width: "32px", height: "2px", background: "var(--accent)", marginBottom: "20px" }} />
                 <p
                   style={{
                     fontFamily: "var(--font-body)",
                     fontSize: "15px",
                     lineHeight: 1.7,
-                    color: "var(--muted)",
-                    margin: 0,
+                    color: "#5A5752",
+                    maxWidth: "340px",
                   }}
                 >
-                  {f.body}
+                  Dual-track stainless steel blades are precision-ground to ±0.02 mm tolerance. The blade geometry maintains sharpness across 10,000 trim cycles before any degradation in cutting performance.
                 </p>
-              </>
-            );
-          })()}
-        </div>
+              </div>
+              <div style={{ display: "flex", gap: "24px", marginTop: "32px" }}>
+                <div>
+                  <div
+                    style={{
+                      fontFamily: "var(--font-heading)",
+                      fontSize: "clamp(2rem, 3vw, 2.8rem)",
+                      fontWeight: 700,
+                      color: "var(--text)",
+                      letterSpacing: "-0.03em",
+                    }}
+                  >
+                    10K
+                  </div>
+                  <div style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#8A8480", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                    Trim Cycles
+                  </div>
+                </div>
+                <div>
+                  <div
+                    style={{
+                      fontFamily: "var(--font-heading)",
+                      fontSize: "clamp(2rem, 3vw, 2.8rem)",
+                      fontWeight: 700,
+                      color: "var(--text)",
+                      letterSpacing: "-0.03em",
+                    }}
+                  >
+                    0.5
+                    <span style={{ fontSize: "1rem" }}>mm</span>
+                  </div>
+                  <div style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "#8A8480", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                    Min Length
+                  </div>
+                </div>
+              </div>
+            </div>
 
-        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-          <div style={{ textAlign: "center", marginBottom: "48px" }}>
-            <span
+            {/* Top-right tile */}
+            <div
               style={{
-                display: "block",
-                fontFamily: "var(--font-body)",
-                fontSize: "11px",
-                fontWeight: 700,
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: "var(--muted)",
-                marginBottom: "12px",
+                background: "#1C1C1C",
+                padding: "clamp(1.5rem, 3vw, 2.5rem)",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
               }}
             >
-              Engineering Inside
-            </span>
-            <h2
-              style={{
-                fontFamily: "var(--font-heading)",
-                fontSize: "clamp(1.8rem, 3.5vw, 3rem)",
-                fontWeight: 700,
-                letterSpacing: "-0.02em",
-                color: "var(--bg)",
-                margin: "0 0 12px",
-              }}
-            >
-              Technology Breakdown
-            </h2>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "15px", color: "#666", margin: 0 }}>
-              Tap any hotspot to explore the engineering behind every component.
-            </p>
-          </div>
-
-          {/* Image + hotspots */}
-          <div
-            style={{
-              position: "relative",
-              maxWidth: "780px",
-              margin: "0 auto",
-              borderRadius: "8px",
-              overflow: "visible",
-            }}
-          >
-            <img
-              src="/product-1.jpg"
-              alt="Philips Series 3000/5000 Beard Trimmer — interactive feature diagram"
-              style={{
-                width: "100%",
-                aspectRatio: "16/9",
-                objectFit: "contain",
-                background: "var(--text)",
-                borderRadius: "8px",
-                display: "block",
-              }}
-            />
-            {techFeatures.map((f) => (
-              <button
-                key={f.id}
-                className={`hotspot-btn${selectedFeature === f.id ? " active" : selectedFeature !== null ? " dimmed" : ""}`}
-                style={{ top: f.top, left: f.left }}
-                onClick={() => setSelectedFeature(selectedFeature === f.id ? null : f.id)}
-                aria-label={`Feature ${f.label}: ${f.title}`}
+              <div
+                style={{
+                  width: "36px",
+                  height: "36px",
+                  border: "1.5px solid rgba(255,255,255,0.3)",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginBottom: "20px",
+                }}
               >
-                {f.label}
-              </button>
-            ))}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1.5">
+                  <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" strokeLinecap="round" strokeLinejoin="round" />
+                  <polyline points="13 2 13 9 20 9" />
+                </svg>
+              </div>
+              <div>
+                <h3
+                  style={{
+                    fontFamily: "var(--font-heading)",
+                    fontSize: "1.25rem",
+                    fontWeight: 600,
+                    letterSpacing: "-0.015em",
+                    color: "#F5F3EF",
+                    marginBottom: "10px",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  90-Min Cordless Runtime
+                </h3>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", lineHeight: 1.6, color: "rgba(255,255,255,0.5)" }}>
+                  USB-C fast charge. Full power in 60 minutes. No performance drop as battery depletes.
+                </p>
+              </div>
+            </div>
+
+            {/* Bottom-right tile */}
+            <div
+              style={{
+                background: "#F5F3EF",
+                padding: "clamp(1.5rem, 3vw, 2.5rem)",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                borderTop: "1px solid #D0CEC9",
+              }}
+            >
+              <div
+                style={{
+                  width: "36px",
+                  height: "36px",
+                  border: "1.5px solid var(--text)",
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginBottom: "20px",
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text)" strokeWidth="1.5">
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" strokeLinecap="round" />
+                </svg>
+              </div>
+              <div>
+                <h3
+                  style={{
+                    fontFamily: "var(--font-heading)",
+                    fontSize: "1.25rem",
+                    fontWeight: 600,
+                    letterSpacing: "-0.015em",
+                    color: "var(--text)",
+                    marginBottom: "10px",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  20 Precision Settings
+                </h3>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", lineHeight: 1.6, color: "#5A5752" }}>
+                  Indexed comb positions from 0.5 mm to 10 mm. Each setting clicks and locks under load.
+                </p>
+              </div>
+            </div>
           </div>
-
-          <p
-            style={{
-              textAlign: "center",
-              fontFamily: "var(--font-body)",
-              fontSize: "12px",
-              color: "#999",
-              marginTop: "20px",
-              letterSpacing: "0.08em",
-            }}
-          >
-            SELECT A HOTSPOT TO EXPLORE
-          </p>
         </div>
       </section>
 
-      {/* ── BRAND MANIFESTO (Asymmetric Split) ── */}
-      <section
-        className="reveal manifesto-grid"
-        style={{
-          background: "var(--bg)",
-          padding: "96px 24px",
-          display: "grid",
-          gridTemplateColumns: "65fr 35fr",
-          gap: "48px",
-          maxWidth: "1200px",
-          margin: "0 auto",
-          alignItems: "center",
-        }}
-      >
-        <div style={{ paddingRight: "16px" }}>
-          <span
-            style={{
-              display: "block",
-              fontFamily: "var(--font-body)",
-              fontSize: "11px",
-              fontWeight: 700,
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              color: "var(--primary)",
-              marginBottom: "16px",
-            }}
-          >
-            Our Philosophy
-          </span>
-          <h2
-            style={{
-              fontFamily: "var(--font-heading)",
-              fontSize: "clamp(2rem, 4vw, 3.2rem)",
-              fontWeight: 700,
-              letterSpacing: "-0.025em",
-              lineHeight: 1.1,
-              color: "var(--text)",
-              margin: "0 0 0",
-            }}
-          >
-            We Sell Handsomeness.
-          </h2>
-          {/* Accent underline */}
-          <div style={{ width: "56px", height: "2px", background: "var(--primary)", margin: "24px 0" }} />
-          <p
-            style={{
-              fontFamily: "var(--font-body)",
-              fontSize: "17px",
-              lineHeight: 1.75,
-              color: "var(--muted)",
-              margin: "0 0 24px",
-              maxWidth: "520px",
-            }}
-          >
-            Great grooming isn't about vanity — it's about control. Every millimetre of precision you achieve with the right tool translates directly to confidence in every room you walk into.
-          </p>
-          <p
-            style={{
-              fontFamily: "var(--font-body)",
-              fontSize: "15px",
-              lineHeight: 1.7,
-              color: "var(--muted)",
-              margin: "0 0 36px",
-              maxWidth: "480px",
-            }}
-          >
-            We source and curate only grooming instruments that meet our single non-negotiable standard: measurable, repeatable precision. Nothing superfluous. No excess words. Just function and form.
-          </p>
-          <button
-            onClick={() => router.push("/shop")}
-            onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.02)")}
-            onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
-            onMouseDown={e => (e.currentTarget.style.transform = "scale(0.98)")}
-            onMouseUp={e => (e.currentTarget.style.transform = "scale(1.02)")}
-            style={{
-              fontFamily: "var(--font-body)",
-              fontSize: "14px",
-              fontWeight: 600,
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-              background: "transparent",
-              color: "var(--accent)",
-              border: "1px solid var(--accent)",
-              borderRadius: "2px",
-              padding: "0 32px",
-              height: "48px",
-              cursor: "pointer",
-              transition: "transform 0.15s ease",
-              whiteSpace: "nowrap",
-            }}
-          >
-            Shop the Collection
-          </button>
-        </div>
-
-        <div
-          className="manifesto-img"
-          style={{
-            overflow: "hidden",
-            borderRadius: "4px",
-            aspectRatio: "1/1",
-          }}
-        >
-          <img
-            src="/product-3.jpg"
-            alt="Precise grooming tool held in hand — close-up"
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              transition: "transform 0.7s ease",
-            }}
-            onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.04)")}
-            onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
-          />
-        </div>
-      </section>
-
-      {/* ── CROWD FAVOURITES — Horizontal Rail ── */}
+      {/* ── PRODUCT GRID: HORIZONTAL_RAIL ── */}
       <section
         className="reveal"
-        id="bestsellers"
         style={{
-          background: "var(--text)",
-          padding: "80px 0",
+          background: "#F5F3EF",
+          padding: "clamp(4rem, 8vw, 8rem) 0",
         }}
       >
-        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 24px" }}>
+        <div style={{ maxWidth: "1280px", margin: "0 auto", paddingLeft: "clamp(1.5rem, 5vw, 5rem)" }}>
           <div
             style={{
               display: "flex",
-              alignItems: "baseline",
+              alignItems: "flex-end",
               justifyContent: "space-between",
+              paddingRight: "clamp(1.5rem, 5vw, 5rem)",
               marginBottom: "40px",
-              flexWrap: "wrap",
-              gap: "16px",
             }}
           >
             <div>
               <span
                 style={{
-                  display: "block",
                   fontFamily: "var(--font-body)",
-                  fontSize: "11px",
+                  fontSize: "10px",
                   fontWeight: 700,
-                  letterSpacing: "0.2em",
+                  letterSpacing: "0.22em",
                   textTransform: "uppercase",
-                  color: "#888",
-                  marginBottom: "10px",
+                  color: "var(--accent)",
                 }}
               >
-                Our Products
+                The Range
               </span>
               <h2
                 style={{
                   fontFamily: "var(--font-heading)",
                   fontSize: "clamp(1.8rem, 3vw, 2.8rem)",
-                  fontWeight: 700,
+                  fontWeight: 600,
                   letterSpacing: "-0.02em",
-                  color: "var(--bg)",
-                  margin: 0,
+                  color: "var(--text)",
+                  marginTop: "8px",
+                  textTransform: "uppercase",
+                }}
+              >
+                Shop the Series
+              </h2>
+            </div>
+            <button
+              onClick={() => router.push("/shop")}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "13px",
+                fontWeight: 600,
+                letterSpacing: "0.08em",
+                background: "transparent",
+                color: "var(--text)",
+                border: "1px solid rgba(26,26,26,0.3)",
+                borderRadius: "2px",
+                padding: "10px 24px",
+                cursor: "pointer",
+                transition: "transform 0.15s ease",
+                textTransform: "uppercase",
+                whiteSpace: "nowrap",
+              }}
+            >
+              View All
+            </button>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              gap: "20px",
+              overflowX: "auto",
+              scrollSnapType: "x mandatory",
+              paddingRight: "clamp(1.5rem, 5vw, 5rem)",
+              paddingBottom: "8px",
+              msOverflowStyle: "none",
+              scrollbarWidth: "none",
+            }}
+          >
+            {products.map((p) => (
+              <article
+                key={p.id}
+                onClick={() =>
+                  router.push(
+                    `/product?name=${encodeURIComponent(p.name)}&price=${p.price}&img=${encodeURIComponent(p.img)}`
+                  )
+                }
+                style={{
+                  flex: "0 0 auto",
+                  width: "clamp(240px, 28vw, 300px)",
+                  scrollSnapAlign: "start",
+                  cursor: "pointer",
+                  transition: "transform 0.3s cubic-bezier(0.4,0,0.2,1)",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-4px)")}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+              >
+                <div
+                  style={{
+                    overflow: "hidden",
+                    background: "#ECEAE5",
+                    borderRadius: "var(--radius-md)",
+                    marginBottom: "16px",
+                    position: "relative",
+                  }}
+                >
+                  {p.badge && (
+                    <span
+                      style={{
+                        position: "absolute",
+                        top: "12px",
+                        left: "12px",
+                        background: "var(--accent)",
+                        color: "#fff",
+                        fontFamily: "var(--font-body)",
+                        fontSize: "10px",
+                        fontWeight: 700,
+                        letterSpacing: "0.1em",
+                        padding: "4px 10px",
+                        borderRadius: "2px",
+                        textTransform: "uppercase",
+                        zIndex: 2,
+                      }}
+                    >
+                      {p.badge}
+                    </span>
+                  )}
+                  <img
+                    src={p.img}
+                    alt={p.name}
+                    style={{
+                      width: "100%",
+                      aspectRatio: "4/5",
+                      objectFit: "cover",
+                      transition: "transform 0.6s ease",
+                      display: "block",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                  />
+                </div>
+                <h3
+                  style={{
+                    fontFamily: "var(--font-body)",
+                    fontWeight: 600,
+                    fontSize: "14px",
+                    color: "var(--text)",
+                    marginBottom: "4px",
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {p.name}
+                </h3>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "12px" }}>
+                  <span
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontWeight: 700,
+                      fontSize: "1.1rem",
+                      color: "var(--text)",
+                    }}
+                  >
+                    ₹{p.price.toLocaleString("en-IN")}
+                  </span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddToCart(p);
+                    }}
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      letterSpacing: "0.06em",
+                      background: addedId === p.id ? "#4A7C59" : "var(--text)",
+                      color: "#F5F3EF",
+                      border: "none",
+                      borderRadius: "2px",
+                      padding: "8px 16px",
+                      cursor: "pointer",
+                      transition: "background 0.2s ease, transform 0.15s ease",
+                      textTransform: "uppercase",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                  >
+                    {addedId === p.id ? "✓ Added" : "Add to Bag"}
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── TECHNOLOGY BREAKDOWN: Full-bleed dark band with hotspot annotations ── */}
+      <section
+        className="reveal"
+        style={{
+          background: "#1C1C1C",
+          padding: "clamp(4rem, 8vw, 8rem) clamp(1.5rem, 5vw, 5rem)",
+          position: "relative",
+        }}
+      >
+        <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
+          <div style={{ marginBottom: "40px" }}>
+            <span
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "10px",
+                fontWeight: 700,
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+                color: "var(--accent)",
+              }}
+            >
+              Under the hood
+            </span>
+            <h2
+              style={{
+                fontFamily: "var(--font-heading)",
+                fontSize: "clamp(1.8rem, 3vw, 2.8rem)",
+                fontWeight: 600,
+                letterSpacing: "-0.02em",
+                color: "#F5F3EF",
+                marginTop: "8px",
+                textTransform: "uppercase",
+              }}
+            >
+              Technology Breakdown
+            </h2>
+          </div>
+
+          {/* 16:9 image with hotspots */}
+          <div
+            style={{
+              maxWidth: "900px",
+              margin: "0 auto",
+              position: "relative",
+            }}
+          >
+            <div style={{ position: "relative", borderRadius: "var(--radius-md)", overflow: "hidden" }}>
+              <img
+                src="/product-1.jpg"
+                alt="Trimmer with head detached — annotated technology view"
+                style={{
+                  width: "100%",
+                  aspectRatio: "16/9",
+                  objectFit: "cover",
+                  display: "block",
+                }}
+              />
+              {/* Dark overlay for contrast */}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: "rgba(0,0,0,0.35)",
+                }}
+              />
+              {/* Hotspots */}
+              {techFeatures.map((f) => (
+                <button
+                  key={f.id}
+                  onClick={() => setSelectedFeature(selectedFeature === f.id ? null : f.id)}
+                  style={{
+                    position: "absolute",
+                    top: f.top,
+                    left: f.left,
+                    transform: "translate(-50%, -50%)",
+                    width: "32px",
+                    height: "32px",
+                    borderRadius: "50%",
+                    background: selectedFeature === f.id ? "var(--accent)" : "transparent",
+                    border: `2px solid ${selectedFeature === f.id ? "var(--accent)" : "#F5F3EF"}`,
+                    color: "#F5F3EF",
+                    fontSize: "10px",
+                    fontWeight: 700,
+                    fontFamily: "var(--font-body)",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    transition: "background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease",
+                    opacity: selectedFeature !== null && selectedFeature !== f.id ? 0.35 : 1,
+                    zIndex: 10,
+                    letterSpacing: "0.04em",
+                  }}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Spec panel — slides in below image on selection */}
+            <div
+              style={{
+                maxHeight: selectedFeature ? "300px" : "0",
+                overflow: "hidden",
+                transition: "max-height 350ms ease-out",
+              }}
+            >
+              {selectedTech && (
+                <div
+                  style={{
+                    background: "#F5F3EF",
+                    borderRadius: "var(--radius-md)",
+                    padding: "clamp(1.5rem, 3vw, 2.5rem)",
+                    marginTop: "16px",
+                    display: "grid",
+                    gridTemplateColumns: isMobile ? "1fr" : "auto 1fr",
+                    gap: "24px",
+                    alignItems: "start",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "48px",
+                      height: "48px",
+                      background: "var(--accent)",
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                      fontFamily: "var(--font-body)",
+                      fontSize: "14px",
+                      fontWeight: 700,
+                      color: "#fff",
+                    }}
+                  >
+                    {selectedTech.label}
+                  </div>
+                  <div>
+                    <h3
+                      style={{
+                        fontFamily: "var(--font-heading)",
+                        fontSize: "1.3rem",
+                        fontWeight: 600,
+                        letterSpacing: "-0.01em",
+                        color: "var(--text)",
+                        marginBottom: "12px",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {selectedTech.title}
+                    </h3>
+                    <p
+                      style={{
+                        fontFamily: "var(--font-body)",
+                        fontSize: "15px",
+                        lineHeight: 1.7,
+                        color: "#5A5752",
+                      }}
+                    >
+                      {selectedTech.body}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Hint label */}
+            {selectedFeature === null && (
+              <p
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "12px",
+                  color: "rgba(255,255,255,0.4)",
+                  textAlign: "center",
+                  marginTop: "16px",
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                }}
+              >
+                Tap a hotspot to explore
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* ── BRAND MANIFESTO: ASYMMETRIC_SPLIT ── */}
+      <section
+        className="reveal"
+        style={{
+          background: "var(--bg)",
+          padding: "clamp(4rem, 8vw, 8rem) clamp(1.5rem, 5vw, 5rem)",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: "1280px",
+            margin: "0 auto",
+            display: "grid",
+            gridTemplateColumns: isMobile ? "1fr" : "60fr 40fr",
+            gap: "clamp(2rem, 5vw, 5rem)",
+            alignItems: "center",
+          }}
+        >
+          {/* Text */}
+          <div>
+            <span
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "10px",
+                fontWeight: 700,
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+                color: "var(--accent)",
+                display: "block",
+                marginBottom: "20px",
+              }}
+            >
+              The philosophy
+            </span>
+            <h2
+              style={{
+                fontFamily: "var(--font-heading)",
+                fontSize: "clamp(2.2rem, 4vw, 4rem)",
+                fontWeight: 700,
+                letterSpacing: "-0.03em",
+                lineHeight: 1.0,
+                color: "var(--text)",
+                marginBottom: "32px",
+                textTransform: "uppercase",
+              }}
+            >
+              Function is<br />the aesthetic.
+            </h2>
+            <p
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "16px",
+                lineHeight: 1.75,
+                color: "#5A5752",
+                maxWidth: "480px",
+                marginBottom: "20px",
+              }}
+            >
+              We don't engineer for shelf appeal. Every gram of weight, every millimetre of blade travel, every texture on the grip — these are specifications, not style decisions.
+            </p>
+            <p
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: "16px",
+                lineHeight: 1.75,
+                color: "#5A5752",
+                maxWidth: "480px",
+                marginBottom: "40px",
+              }}
+            >
+              When the engineering is right, the form follows. That is what we mean by handsomeness.
+            </p>
+            <div style={{ display: "flex", gap: "48px" }}>
+              {[
+                { num: "1M+", label: "Users Served" },
+                { num: "₹299", label: "Starting Price" },
+                { num: "4.7★", label: "Avg. Rating" },
+              ].map((s) => (
+                <div key={s.label}>
+                  <div
+                    style={{
+                      fontFamily: "var(--font-heading)",
+                      fontSize: "clamp(1.8rem, 3vw, 2.4rem)",
+                      fontWeight: 700,
+                      color: "var(--text)",
+                      letterSpacing: "-0.03em",
+                    }}
+                  >
+                    {s.num}
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontSize: "11px",
+                      color: "var(--muted)",
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      marginTop: "4px",
+                    }}
+                  >
+                    {s.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Image */}
+          {!isMobile && (
+            <div
+              style={{
+                overflow: "hidden",
+                borderRadius: "var(--radius-lg)",
+                background: "#ECEAE5",
+              }}
+            >
+              <img
+                src="/product-2.jpg"
+                alt="Matte Black Nose Trimmer — precision detail"
+                style={{
+                  width: "100%",
+                  aspectRatio: "4/5",
+                  objectFit: "cover",
+                  transition: "transform 0.7s ease",
+                  display: "block",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+              />
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ── CROWD FAVOURITES: HORIZONTAL_RAIL on dark band ── */}
+      <section
+        className="reveal"
+        style={{
+          background: "#1C1C1C",
+          padding: "clamp(4rem, 8vw, 8rem) 0",
+        }}
+      >
+        <div style={{ maxWidth: "1280px", margin: "0 auto", paddingLeft: "clamp(1.5rem, 5vw, 5rem)" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-end",
+              justifyContent: "space-between",
+              paddingRight: "clamp(1.5rem, 5vw, 5rem)",
+              marginBottom: "40px",
+            }}
+          >
+            <div>
+              <span
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "10px",
+                  fontWeight: 700,
+                  letterSpacing: "0.22em",
+                  textTransform: "uppercase",
+                  color: "var(--accent)",
+                }}
+              >
+                Most ordered
+              </span>
+              <h2
+                style={{
+                  fontFamily: "var(--font-heading)",
+                  fontSize: "clamp(1.8rem, 3vw, 2.8rem)",
+                  fontWeight: 600,
+                  letterSpacing: "-0.02em",
+                  color: "#F5F3EF",
+                  marginTop: "8px",
+                  textTransform: "uppercase",
                 }}
               >
                 Crowd Favourites
@@ -936,499 +1178,261 @@ export default function HomePage() {
             </div>
             <button
               onClick={() => router.push("/shop")}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
               style={{
                 fontFamily: "var(--font-body)",
                 fontSize: "13px",
                 fontWeight: 600,
                 letterSpacing: "0.08em",
-                textTransform: "uppercase",
                 background: "transparent",
-                color: "var(--bg)",
-                border: "1px solid #1a1a1a",
+                color: "rgba(255,255,255,0.6)",
+                border: "1px solid rgba(255,255,255,0.2)",
                 borderRadius: "2px",
-                padding: "0 24px",
-                height: "40px",
+                padding: "10px 24px",
                 cursor: "pointer",
+                transition: "transform 0.15s ease",
+                textTransform: "uppercase",
                 whiteSpace: "nowrap",
               }}
             >
-              View All
+              See All
             </button>
           </div>
-        </div>
 
-        {/* Scrollable rail */}
-        <div
-          className="product-rail"
-          style={{
-            display: "flex",
-            gap: "20px",
-            overflowX: "auto",
-            scrollSnapType: "x mandatory",
-            paddingLeft: "max(24px, calc((100vw - 1200px)/2 + 24px))",
-            paddingRight: "24px",
-            paddingBottom: "8px",
-          }}
-        >
-          {products.map((p) => (
-            <article
-              key={p.id}
-              style={{
-                flex: "0 0 auto",
-                width: "clamp(240px, 28vw, 300px)",
-                scrollSnapAlign: "start",
-                background: "#fff",
-                borderRadius: "4px",
-                overflow: "hidden",
-                cursor: "pointer",
-                transition: "transform 0.3s cubic-bezier(0.4,0,0.2,1)",
-                border: "1px solid rgba(0,0,0,0.04)",
-              }}
-              onMouseEnter={e => (e.currentTarget.style.transform = "translateY(-6px)")}
-              onMouseLeave={e => (e.currentTarget.style.transform = "translateY(0)")}
-            >
-              <div
-                style={{ overflow: "hidden", background: "#fff" }}
-                onClick={() => router.push(`/product?name=${encodeURIComponent(p.name)}&price=${p.price}&img=${encodeURIComponent(p.img)}`)}
+          <div
+            style={{
+              display: "flex",
+              gap: "20px",
+              overflowX: "auto",
+              scrollSnapType: "x mandatory",
+              paddingRight: "clamp(1.5rem, 5vw, 5rem)",
+              paddingBottom: "8px",
+              msOverflowStyle: "none",
+              scrollbarWidth: "none",
+            }}
+          >
+            {[...products].reverse().map((p, idx) => (
+              <article
+                key={p.id}
+                onClick={() =>
+                  router.push(
+                    `/product?name=${encodeURIComponent(p.name)}&price=${p.price}&img=${encodeURIComponent(p.img)}`
+                  )
+                }
+                style={{
+                  flex: "0 0 auto",
+                  width: "clamp(220px, 24vw, 280px)",
+                  scrollSnapAlign: "start",
+                  cursor: "pointer",
+                  transition: "transform 0.3s cubic-bezier(0.4,0,0.2,1)",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-4px)")}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
               >
-                <img
-                  src={p.img}
-                  alt={p.name}
+                <div
                   style={{
-                    width: "100%",
-                    aspectRatio: "4/5",
-                    objectFit: "contain",
-                    background: "#fff",
-                    transition: "transform 0.6s ease",
-                  }}
-                  onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.04)")}
-                  onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
-                />
-              </div>
-              <div style={{ padding: "16px 20px 20px" }}>
-                <span
-                  style={{
-                    display: "block",
-                    fontFamily: "var(--font-body)",
-                    fontSize: "11px",
-                    fontWeight: 600,
-                    letterSpacing: "0.12em",
-                    textTransform: "uppercase",
-                    color: "#888",
-                    marginBottom: "6px",
+                    overflow: "hidden",
+                    background: "#2A2A2A",
+                    borderRadius: "var(--radius-md)",
+                    marginBottom: "14px",
+                    position: "relative",
                   }}
                 >
-                  {p.tag}
-                </span>
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: "10px",
+                      left: "10px",
+                      fontFamily: "var(--font-body)",
+                      fontSize: "10px",
+                      fontWeight: 700,
+                      color: "rgba(255,255,255,0.3)",
+                      letterSpacing: "0.04em",
+                      zIndex: 2,
+                    }}
+                  >
+                    0{4 - idx}
+                  </span>
+                  <img
+                    src={p.img}
+                    alt={p.name}
+                    style={{
+                      width: "100%",
+                      aspectRatio: "3/4",
+                      objectFit: "cover",
+                      transition: "transform 0.6s ease",
+                      display: "block",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                  />
+                </div>
                 <h3
                   style={{
-                    fontFamily: "var(--font-heading)",
-                    fontSize: "15px",
+                    fontFamily: "var(--font-body)",
                     fontWeight: 600,
-                    color: "var(--bg)",
-                    margin: "0 0 4px",
-                    lineHeight: 1.3,
-                    cursor: "pointer",
+                    fontSize: "13px",
+                    color: "#F5F3EF",
+                    marginBottom: "6px",
+                    lineHeight: 1.4,
                   }}
-                  onClick={() => router.push(`/product?name=${encodeURIComponent(p.name)}&price=${p.price}&img=${encodeURIComponent(p.img)}`)}
                 >
                   {p.name}
                 </h3>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "#777", margin: "0 0 12px", lineHeight: 1.45 }}>
-                  {p.description.split(".")[0]}.
-                </p>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
-                  <span
-                    style={{
-                      fontFamily: "var(--font-body)",
-                      fontSize: "17px",
-                      fontWeight: 700,
-                      color: "var(--accent)",
-                    }}
-                  >
-                    ₹{p.price.toLocaleString("en-IN")}
-                  </span>
-                  <button
-                    onClick={() => handleAddToCart(p)}
-                    style={{
-                      fontFamily: "var(--font-body)",
-                      fontSize: "12px",
-                      fontWeight: 600,
-                      letterSpacing: "0.04em",
-                      background: addedId === p.id ? "var(--bg)" : "var(--primary)",
-                      color: addedId === p.id ? "#fff" : "var(--bg)",
-                      border: "none",
-                      borderRadius: "2px",
-                      padding: "0 16px",
-                      height: "36px",
-                      cursor: "pointer",
-                      transition: "background 0.2s ease",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {addedId === p.id ? "✓ Added" : "Add to Cart"}
-                  </button>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {/* ── EDITORIAL OFFSET FEATURE ROW ── */}
-      <section
-        className="reveal"
-        style={{
-          background: "var(--bg)",
-          padding: "96px 24px",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            maxWidth: "1200px",
-            margin: "0 auto",
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))",
-            gap: "64px",
-            alignItems: "center",
-          }}
-        >
-          {/* Left: trimmer image anchored left */}
-          <div
-            style={{
-              position: "relative",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                top: "-24px",
-                left: "-24px",
-                width: "2px",
-                height: "calc(100% + 48px)",
-                background: "var(--accent)",
-                opacity: 0.4,
-              }}
-            />
-            <div style={{ overflow: "hidden", borderRadius: "4px" }}>
-              <img
-                src="/product-1.jpg"
-                alt="Philips Series 3000/5000 Beard Trimmer — feature detail"
-                style={{
-                  width: "100%",
-                  objectFit: "contain",
-                  background: "var(--surface)",
-                  aspectRatio: "4/5",
-                  transition: "transform 0.7s ease",
-                }}
-                onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.03)")}
-                onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
-              />
-            </div>
-          </div>
-
-          {/* Right: numbered callouts */}
-          <div>
-            <span
-              style={{
-                display: "block",
-                fontFamily: "var(--font-body)",
-                fontSize: "11px",
-                fontWeight: 700,
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: "var(--primary)",
-                marginBottom: "12px",
-              }}
-            >
-              Why It Works
-            </span>
-            <h2
-              style={{
-                fontFamily: "var(--font-heading)",
-                fontSize: "clamp(1.8rem, 3vw, 2.8rem)",
-                fontWeight: 700,
-                letterSpacing: "-0.02em",
-                color: "var(--text)",
-                margin: "0 0 40px",
-                lineHeight: 1.1,
-              }}
-            >
-              Every Detail.<br />Intentional.
-            </h2>
-
-            {[
-              {
-                num: "01",
-                title: "Self-Sharpening Steel Blades",
-                desc: "Precision-ground to maintain 0.1 mm edge consistency over the lifetime of the device.",
-              },
-              {
-                num: "02",
-                title: "20-Position Adjustable Comb",
-                desc: "Click-lock settings from 0.5 mm to 10 mm. No guesswork. No slipping mid-trim.",
-              },
-              {
-                num: "03",
-                title: "90-Min Cordless Runtime",
-                desc: "Full charge in 60 minutes. One week of daily trims on a single cycle.",
-              },
-            ].map((item, i) => (
-              <div
-                key={i}
-                style={{
-                  display: "flex",
-                  gap: "24px",
-                  marginBottom: "32px",
-                  paddingBottom: "32px",
-                  borderBottom: i < 2 ? "1px solid rgba(240,238,233,0.08)" : "none",
-                }}
-              >
                 <span
                   style={{
-                    fontFamily: "var(--font-heading)",
-                    fontSize: "13px",
+                    fontFamily: "var(--font-body)",
                     fontWeight: 700,
+                    fontSize: "1rem",
                     color: "var(--accent)",
-                    letterSpacing: "0.06em",
-                    minWidth: "28px",
-                    paddingTop: "3px",
                   }}
                 >
-                  {item.num}
+                  ₹{p.price.toLocaleString("en-IN")}
                 </span>
-                <div>
-                  <h4
-                    style={{
-                      fontFamily: "var(--font-heading)",
-                      fontSize: "16px",
-                      fontWeight: 700,
-                      color: "var(--text)",
-                      margin: "0 0 8px",
-                      letterSpacing: "-0.01em",
-                    }}
-                  >
-                    {item.title}
-                  </h4>
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: "14px", lineHeight: 1.65, color: "var(--muted)", margin: 0 }}>
-                    {item.desc}
-                  </p>
-                </div>
-              </div>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── SOCIAL PROOF EDITORIAL STRIP ── */}
+      {/* ── NEWSLETTER: Full-bleed warm band ── */}
       <section
         className="reveal"
         style={{
-          background: "var(--text)",
-          padding: "80px 24px",
+          background: "#F5F3EF",
+          padding: "clamp(4rem, 8vw, 8rem) clamp(1.5rem, 5vw, 5rem)",
+          borderTop: "1px solid #D0CEC9",
         }}
       >
-        <div style={{ maxWidth: "900px", margin: "0 auto" }}>
-          <svg width="36" height="28" viewBox="0 0 36 28" fill="none" style={{ marginBottom: "24px", opacity: 0.3 }}>
-            <path d="M0 28V16C0 7.163 5.373 1.653 16.12 0l1.88 3.04C12.347 4.307 9.413 7.507 8.48 12H16V28H0ZM20 28V16C20 7.163 25.373 1.653 36.12 0L38 3.04C32.347 4.307 29.413 7.507 28.48 12H36V28H20Z" fill="var(--bg)"/>
-          </svg>
-          <blockquote
-            style={{
-              fontFamily: "var(--font-heading)",
-              fontSize: "clamp(1.4rem, 3vw, 2.2rem)",
-              fontStyle: "italic",
-              fontWeight: 400,
-              color: "var(--bg)",
-              lineHeight: 1.45,
-              margin: "0 0 32px",
-              letterSpacing: "-0.01em",
-            }}
-          >
-            "Used three different beard trimmers before this one. None of them held the length setting consistently past the second trim. This one locks, stays locked, and the blade stays sharp. Nothing more to say."
-          </blockquote>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              flexWrap: "wrap",
-              gap: "16px",
-            }}
-          >
-            <div>
-              <div style={{ display: "flex", gap: "4px", marginBottom: "6px" }}>
-                {[1,2,3,4,5].map(i => (
-                  <svg key={i} width="14" height="14" viewBox="0 0 12 12" fill="none">
-                    <polygon points="6,0.5 7.5,4.5 12,4.8 8.8,7.6 9.9,12 6,9.5 2.1,12 3.2,7.6 0,4.8 4.5,4.5" fill="var(--primary)"/>
-                  </svg>
-                ))}
-              </div>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: "14px", fontWeight: 600, color: "var(--bg)" }}>
-                Sudhanshu Verma
-              </span>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: "13px", color: "#888", marginLeft: "8px" }}>
-                Pune, Maharashtra
-              </span>
-            </div>
-            <span
-              style={{
-                fontFamily: "var(--font-body)",
-                fontSize: "12px",
-                fontWeight: 700,
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                color: "#888",
-              }}
-            >
-              4,800+ verified buyers
-            </span>
-          </div>
-        </div>
-      </section>
-
-      {/* ── NEWSLETTER CTA BAND ── */}
-      <section
-        id="contact"
-        className="reveal"
-        style={{
-          background: "var(--surface)",
-          padding: "96px 24px",
-          textAlign: "center",
-          borderTop: "1px solid rgba(240,238,233,0.06)",
-        }}
-      >
-        <div style={{ maxWidth: "560px", margin: "0 auto" }}>
+        <div
+          style={{
+            maxWidth: "640px",
+            margin: "0 auto",
+            textAlign: "center",
+          }}
+        >
           <span
             style={{
-              display: "block",
               fontFamily: "var(--font-body)",
-              fontSize: "11px",
+              fontSize: "10px",
               fontWeight: 700,
-              letterSpacing: "0.2em",
+              letterSpacing: "0.22em",
               textTransform: "uppercase",
-              color: "var(--primary)",
+              color: "var(--accent)",
+              display: "block",
               marginBottom: "16px",
             }}
           >
-            Stay Sharp
+            Stay sharp
           </span>
           <h2
             style={{
               fontFamily: "var(--font-heading)",
-              fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)",
+              fontSize: "clamp(2rem, 4vw, 3.5rem)",
               fontWeight: 700,
-              letterSpacing: "-0.025em",
+              letterSpacing: "-0.03em",
               color: "var(--text)",
-              margin: "0 0 12px",
+              marginBottom: "16px",
+              textTransform: "uppercase",
+              lineHeight: 1.05,
             }}
           >
-            First Access.<br />No Noise.
+            Early access.<br />No noise.
           </h2>
           <p
             style={{
               fontFamily: "var(--font-body)",
               fontSize: "15px",
-              color: "var(--muted)",
-              lineHeight: 1.65,
-              margin: "0 0 36px",
+              lineHeight: 1.7,
+              color: "#5A5752",
+              marginBottom: "36px",
+              maxWidth: "400px",
+              margin: "0 auto 36px",
             }}
           >
-            New arrivals, exclusive pricing, and grooming guides — delivered to your inbox when it matters.
+            New product drops, restocks, and grooming guides — delivered directly. Zero promotions, only specifications.
           </p>
-
           {subscribed ? (
             <div
               style={{
-                padding: "20px 32px",
-                background: "rgba(61,196,242,0.1)",
-                border: "1px solid rgba(61,196,242,0.3)",
-                borderRadius: "4px",
                 fontFamily: "var(--font-body)",
                 fontSize: "15px",
-                color: "var(--primary)",
+                color: "#4A7C59",
                 fontWeight: 600,
+                padding: "20px",
+                background: "rgba(74,124,89,0.08)",
+                borderRadius: "var(--radius-md)",
+                border: "1px solid rgba(74,124,89,0.2)",
               }}
             >
-              ✓ You're on the list. We'll be in touch.
+              You're in. Expect precision.
             </div>
           ) : (
             <form
               onSubmit={handleSubscribe}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "12px",
-                alignItems: "center",
-              }}
+              style={{ display: "flex", gap: "0", maxWidth: "440px", margin: "0 auto" }}
             >
-              <div
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com"
+                required
                 style={{
-                  display: "flex",
-                  width: "100%",
-                  maxWidth: "460px",
-                  gap: "0",
-                  flexWrap: "wrap",
-                  justifyContent: "center",
-                  gap: "10px",
+                  flex: 1,
+                  fontFamily: "var(--font-body)",
+                  fontSize: "14px",
+                  padding: "0 20px",
+                  height: "52px",
+                  border: "1px solid #D0CEC9",
+                  borderRight: "none",
+                  borderRadius: "2px 0 0 2px",
+                  background: "#fff",
+                  color: "var(--text)",
+                  outline: "none",
+                }}
+              />
+              <button
+                type="submit"
+                onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "13px",
+                  fontWeight: 700,
+                  letterSpacing: "0.08em",
+                  background: "var(--text)",
+                  color: "#F5F3EF",
+                  border: "none",
+                  borderRadius: "0 2px 2px 0",
+                  padding: "0 28px",
+                  height: "52px",
+                  cursor: "pointer",
+                  transition: "transform 0.15s ease",
+                  textTransform: "uppercase",
+                  whiteSpace: "nowrap",
                 }}
               >
-                <input
-                  type="email"
-                  required
-                  placeholder="your@email.com"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  style={{
-                    flex: "1 1 240px",
-                    height: "52px",
-                    padding: "0 20px",
-                    background: "rgba(240,238,233,0.08)",
-                    border: "1px solid rgba(240,238,233,0.15)",
-                    borderRadius: "2px",
-                    color: "var(--text)",
-                    fontFamily: "var(--font-body)",
-                    fontSize: "15px",
-                    outline: "none",
-                    minWidth: "0",
-                  }}
-                />
-                <button
-                  type="submit"
-                  onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.02)")}
-                  onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
-                  onMouseDown={e => (e.currentTarget.style.transform = "scale(0.98)")}
-                  onMouseUp={e => (e.currentTarget.style.transform = "scale(1.02)")}
-                  style={{
-                    height: "52px",
-                    padding: "0 28px",
-                    background: "var(--primary)",
-                    color: "var(--bg)",
-                    border: "none",
-                    borderRadius: "2px",
-                    fontFamily: "var(--font-body)",
-                    fontSize: "14px",
-                    fontWeight: 700,
-                    letterSpacing: "0.06em",
-                    textTransform: "uppercase",
-                    cursor: "pointer",
-                    transition: "transform 0.15s ease",
-                    whiteSpace: "nowrap",
-                    flexShrink: 0,
-                  }}
-                >
-                  Subscribe
-                </button>
-              </div>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: "12px", color: "var(--muted)" }}>
-                No spam. Unsubscribe at any time.
-              </p>
+                Subscribe
+              </button>
             </form>
           )}
+          <p
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "11px",
+              color: "var(--muted)",
+              marginTop: "16px",
+              letterSpacing: "0.04em",
+            }}
+          >
+            No spam. Unsubscribe anytime. Made in India.
+          </p>
         </div>
       </section>
 
       <Footer />
-    </>
+    </div>
   );
 }
